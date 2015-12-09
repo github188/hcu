@@ -1,0 +1,567 @@
+http://wenku.baidu.com/link?url=jxE0qtkObN-GUw--_uRWwGBxmXNjB-VTfQeYo5d9PLZC56c2QQAiZiH2zwenjnyA6EWtNHknKKcHZjsRZYiTkk4FkqRgsCfVM335uimEqw7
+
+http://linux.chinaunix.net/techdoc/desktop/2007/03/22/952941.shtml
+
+在网上发现一篇讲解利用mplayer的mencoder转换视频的文章，刚好适用我简陋的mp4转贴一下^_^，原文网址：
+Linux下的视频转换
+制作适合在智能手机和PDA上观看的mpeg4视频。
+Linux上有一个很强大的视频音频转换软件，就是Mplayer自带的mencoder (MPlayer's Movie Encoder)。mencoder就象是一台全手动的照相机，可调整的选项非常多，不过这儿只是把最常见的情况说一下。
+转换avi文件，并把字幕内嵌到视频中。首先假设一下下列的条件：
+文件名：video.avi
+字幕文件名：video.srt
+目标文件：new.avi
+目标文件格式：mpeg4
+目标文件视频码率：200
+目标文件音频码率：64
+目标文件分辨率： 320：240
+制作内嵌字幕所需的字体：simsun.ttf
+（上面各项都可以根据实际情况进行调整）
+转换命令如下：
+mencoder
+-oac mp3lame -lameopts vbr=3:br=64 -ovc lavc -lavcopts
+vcodec=mpeg4:mbd=1:vbitrate=200 -sub video.srt -o new.avi -font
+simsun.ttf video.avi -subcp cp936 -subfont-text-scale 4 -vf
+scale=320:240
+各选项的含义：
+-oac 编码文件的音频部分。这儿是用lame将音频encode成mp3,即mp3lame。其他可用的选项可以调用mencoder的man page查看。
+-lameopts 顾名思义，即lame选项，这儿只需定义一下码率就可以了。
+vbr 设定音频码率的方法，格式为vbr=
+0 cbr average bitrate
+1 mt
+2 rh   constant bitrate Also forces CBR mode encoding on subsequent ABR presets modes.
+3 abr
+4 mtrh
+在这儿用的是3,abr。
+br 就是设定我们所需要的码率值，格式为br=，只能在vbr为0和3的情况下才能使用该选项。
+-ovc 编码文件的视频部分。主要有以下几个选项
+-ovc copy
+      不进行编码，只是复制视频流
+-ovc divx4
+      编码成DivX4/DivX5
+-ovc raw
+      编码成任意不压缩的格式（用‘-vf format’设定具体的格式）
+-ovc lavc
+      使用libavcodec进行编码
+-lavcopts 就是libavcodec的选项。
+vcodec=使用指定的视频编码，下面列一下几个主要的值
+h264
+  H.264
+h263
+  H.263
+h263p
+  H.263+
+mpeg4
+  MPEG-4 (DivX 4/5)
+msmpeg4
+  DivX 3
+msmpeg4v2
+  MS MPEG4v2
+wmv1
+  Windows Media Video, version 1 (又称 WMV7)
+wmv2
+  Windows Media Video, version 2 (又称 WMV8)
+rv10
+  旧的RealVideo格式
+mpeg1video
+  MPEG-1 video
+mpeg2video
+  MPEG-2 video
+mbd 决定视频宏块的算法，这儿只需要mbd=1即可。其余的可以查看man page。
+vbitrate 设定视频的码率（默认为800）。
+-sub 设定字幕文件
+-o 目标视频文件
+-font 制作内嵌字幕所需字体的路径
+-subcp 字幕的编码，简体中文就是cp936
+-subfont-text-scale 字幕字体的大小
+-vf scale 视频的分辨率
+如果不需要将字幕内嵌入视频文件，只需要去掉-sub、-font、-subcp、-subfont-text-scale这几个选项。将rmvb转换成mpeg4也是如此。
+Linux下的视频转换：ffmpeg
+格式：ffmpeg [[输入文件选项]- i 输入文件名] {[输入文件选项] 输出文件名}
+
+主要选项：
+-L 显示ffmpeg的版权说明
+-h 显示帮助
+-version 显示版本
+-formats 显示支持的文件格式，编码和协议
+-f 格式名 强制使用格式
+-img 文件格式名 强制使用片格式
+-i 文件名 待转换文件名字
+-y 覆盖同名输出文件
+-t 时间 设置影片时间长度
+-fs 最大尺寸 设置文件的最大尺寸
+-ss 时间点 设置开始转换的时间点
+-title 文字 设置标题
+-author 文字 设置作者
+-copyright 文字 设置版权声明
+-comment 文字 设置备注
+
+视频选项：
+-b 比特率 设置文件比特率 (单位是kbit/s)
+-r 速度 桢速度 (Hz value)
+-s 大小 设置大小，宽乘高
+-newvideo 在现在的视频流后面加入信的视频流
+
+Audio options:
+-aframes 数字 设置转换多少桢(frame)的音频
+-ab bitrate 设置音乐的比特率(单位：kbit/s)
+-aq 质量 这只音频质量 (指定编码)
+-ar 采样率 设置音频采样率 (单位：Hz)
+-ac 声道数字 设置声道数
+-an 取消音频
+-acodec 编码 强制音频 编码 ('copy' to copy stream)
+-vol volume 改变音量 (256为普通)
+-newaudio 追加音乐
+- muxvb 768  好像是给PSP机器识别的码率，一般选择384,512和768，我改为1500,PSP说文件损坏了
+- f psp 强制输出格式，PSP专用格式
+-L 现实ffmpeg的版权说明
+-h 现实帮助
+-version 现实版本
+-formats 现实支持的文件格式，编码和协议
+"output.wmv" 输出文件名，也可以追加路径修改文件名
+
+示例1：
+截取一张352x240尺寸大小的，格式为jpg的图片：
+ffmpeg -i test.asf -y -f image2 -t 0.001 -s 352x240 a.jpg
+
+示例2：
+把视频的前30帧转换为一个Animated Gif:
+ffmeg -i test.asf -vframes 30 -y -f gif a.gif
+
+示例3：
+在视频的第8.01秒截取352x240的缩略图
+ffmpeg -i test.asf -y -f image2 -ss 08.010 -t 0.001 -s 352x240 a.jpg
+
+
+a) 通用选项
+-L license
+-h 帮助
+-formats 现实可用的格式，便解码的，协议的
+-f fmt 强迫采用格式fmt
+-I filename 收入文件
+-y 覆盖输出文件
+-t duration 设置记录时间 hh:mm:ss[.xxx]格式的记录时间也支持
+-ss position搜索到制定的时间 [-]hh:mm:ss[.xxx]的格式也支持
+- title string 设置标题
+-author string 设置作者
+-copyright string 设置版权
+-comment string设置评论
+-target type 设置目标文件类型（vcd, svcd, dvd)所有的格式选选项（比特率，便解码以及缓冲区大小）自动设置，只需要输入如下的就可以了。
+
+ffmpeg -i myfile.avi -target vcd/tmp/vcd.mpg
+
+-hq 激活高质量设置
+
+-itsoffset offset 设置以秒为基准的时间偏移，该选项影响所有后面的输入文件，该偏移被加到输入文件的时间戳，定义一个正偏移意味着相应的流被延迟了offset秒。
+[-]hh:mm:ss[.xxx]的格式也支持
+
+b) 视频选项
+
+
+==>
+http://wenku.baidu.com/link?url=jxE0qtkObN-GUw--_uRWwGBxmXNjB-VTfQeYo5d9PLZC56c2QQAiZiH2zwenjnyA6EWtNHknKKcHZjsRZYiTkk4FkqRgsCfVM335uimEqw7
+
+
+
+
+
+=======================================================================
+http://www.cpplive.com/html/1415.html
+
+Linux下转换视频格式与合并视频
+作者 CppLive | 发表于 2011-12-08
+文章分类 : Linux, MacOS, Ubuntu, Windows, 应用与编程
+标签: Linux, Ubuntu, Windows, 开源, 源代码, 视频
+
+ 
+熟悉Windows的朋友应该知道，Windows下的视频格式转换软件与合并视频软件不计其数，刚接触Linux的朋友也许会抱怨Linux下没有强大的视频软件，完成视频播放、转化视频格式、合并视频等功能。今天我要给大家推荐一款Linux下的开源软件MPlayer以及它附带的视频工具mencoder。也许大家还不知道，Windows下的很多视频转换或合并工具都是基于mencoder的内核，再封装使其更人性化的UI界面生成的，所以可见MPlayer及mencoder的强大。    
+MPlayer几乎支持所有视频格式的播放，在Linux、Windows、MacOS上均有支持。在Linux下，安装完MPlayer后就有mencoder，无需额外再安装。由于今天我们要用到的主角是mencoder，不需要安装MPlayer，Ubuntu下可以用如下命令单独安装mencoder：
+sudo apt-get install mencoder  
+其他版本Linux可以到MPlayer官网www.mplayerhq.hu下载源代码编译。
+一、视频格式转换示例——将rm格式视频转换成mp4格式：
+mencoder -ovc lavc -lavcopts vcodec=mpeg4 -oac mp3lame source.rm -o dest.mp4  
+1、-ovc lavc：（output video codec）指定输出视频文件的视频编码类型，此处选择的是 Libavcodec 的视频编码；
+2、-lavcopts vcodec=mpeg4：（Libavcodec options）指定视频编码的设置，由于 Libavcodec 包含了多种视频编码，所以用 vcodec=mpeg4 来指定具体的使用 MPEG-4 编码；
+3、-oac mp3lame：（output audio codec）指定输出媒体文件的音频编码类型，此处选择的是 mp3lame；
+4、source.rm 即你要转换的rm格式的视频文件的路径；
+5、dest.mp4即你要生成的mp4格式的视频文件路径。
+二、视频合并示例——将三个flv格式的视频合并成一个
+mencoder -ovc copy -oac mp3lame 0.flv 2.flv 3.flv -o test.flv  
+1、-ovc copy：指定输出视频文件的视频编码类型，此处copy的含义是不进行重新编码，直接复制视频流，即不转换格式；
+2、-oac mp3lame：指定音频输出格式为mp3lame，当然这里也可以用copy直接复制音频流，但那样一来合并后的文件将是合并前3个文件大小总和的几倍，所以还是建议使用压缩率较高的mp3lame格式；
+3、因为这这里是直接复制视频流，所以其他格式的视频文件也可以合并，只是要注意合并后的目标文件后缀名应该与合并前的文件后缀名保持一致。
+更多详细内容可以参见http://hi.baidu.com/creatives/blog/item/41f6c32ad06cdb2bd42af128.html
+
+
+
+
+
+
+
+http://www.cnblogs.com/zhusanjie/articles/3659884.html
+Linux系统下视频转换：Mencoder和Ffmpeg
+我的格式  mencoder *.* -o 1.avi -oac mp3lame -lameopts cbr:br=64 -srate 32000 -ovc xvid -xvidencopts bitrate=750 -ofps 25 -idx
+
+xvid不能在-ovc lavc 中使用，-lavcoptsvcodec 没有xvid 参数。WMV和RM有，且转换成WMV，RM音频格式好像只能MP3格式，
+
+添加参数选项：
+
+-vf scale=640:480 或-vf scale=x(-3):y(-3)  －3表示不改变比例，只设置宽和高
+
+ -oav -ovc copy  不压缩音视频
+
+-srate 44100 （22500）声音采样率
+
+ctrl+z fg bg 暂停
+
+ 
+ 
+
+以下是转贴3篇：再看不懂我也没有办法了：）
+
+A  因为刚好有些视频要转，google了一下，网上有很多Ubuntu视频转换工具mencoder的介绍，使用以后，觉得有必要汇总一下，留以他用。
+
+　　CODE:
+
+　　mencoder [options] file1 [specific options] [file2] [specific options]
+
+　　mencoder src.avi -o dst.avi -vf scale=320:240 -oac copy -ovc lavc -lavcopts vcodec=mpeg4:vbitrate=500
+
+　　# src.avi 原文件
+
+　　# -o dst.avi 定义压缩为dst.avi
+
+　　# -vf scale=320:240，调整视频尺寸到320x240;
+
+　　# -oac copy，指定音频编码器，copy是指不压缩，直接使用源文件里的音频。copy换成 MP3lame，即压缩成mp3。
+
+　　# -ovc lavc，指定视频编码器，使用libavcodec编码器;
+
+　　# -lavcopts vcodec=mpeg4:vbitrate=500，指定libavcodec的参数，vcodec=mpeg4指使用mpeg4压缩，就是DivX，vbitrate=500指500kbps的比特率。
+
+　　CODE:
+
+　　mencoder src.avi -o dst.flv -of lavf -oac MP3lame -lameopts abr:br=32:mode=3 -ovc lavc i_certify_that_my_video_stream_does_not_use_b_frames -vf scale=350:-3 -sws 2
+
+　　# src.avi 输入文件路径，是Mplayer能支持的格式即可
+
+　　# -o dst.flv 输出路径
+
+　　# -of lavf 输出格式 lavf表示libavcodec
+
+　　# -oac MP3lame 输出音频编码方式，lame是最好的mp3编码器
+
+　　# -lameopts abr:br=32:mode=3 abr代表平均码率，相对于cbr(固定码率)和vbr(可变码率,貌似不支持),br就是音频的码率，越高音质越好,mode=3，0-3分别代表 Stereo,Joint Stereo,Force ms_stereo,Mono(默认为自动，事实上1和3对文件大小的影响并不是很大),另外可选的还有 vol(音量，取值0-10,数值越大音量越大，不建议修改)等
+
+　　# -srate 22050 声音采样频率设置，也可以选11025，文件可以稍小一点
+
+　　# -ovc lavc 输出视频编码 lavc就是libavcodec
+
+　　# -lavcopts codec=flv flv格式压缩 vbitrate=150 视频码率
+
+　　# -vf scale=350:-3 -sws 2 缩放视频，指定宽度为350，高度按比例来。质量由-sws选项控制，具体看手册
+
+　　# -ofps 23 设定帧数，缩小帧数对节约文件大小效果不明显，且可能造成画面声音同步。建议不设置
+
+　　CODE:
+
+　　mencoder -srate 22050 -vf scale=208:-3 -ofps 12 -oac MP3lame -lameopts mode=3:cbr:br=24 -ovc lavc -ffourcc DX50 -lavcopts vcodec=mpeg4:vhq:vbitrate=112 src.avi -o dst.avi
+
+　　# -srate 22050 声音采样频率设置，现为22K
+
+　　# -vf scale=208:-3 宽度为208，高度自动调整保持比例;-vf scale=-3:176宽度自动调整保持比例，高度为176;如果想保持原来的大小可以不要这个参数
+
+　　# -ofps 12 帧速率设置，现为12fps
+
+　　# -oac MP3lame 音频采用mp3编码
+
+　　# -lameopts mode=3:cbr:br=24单声道，音频码率为24kbps;-lameopts mode=0:cbr:br=24立体声，音频码率为24kbps; 还可设置音量，-lameopts mode=3:cbr:br=32:vol=1，设置范置为1~10，但不宜设得太高
+
+　　# -ovc lavc -ffourcc DX50 -lavcopts vcodec=mpeg4:vhq:vbitrate=112采用高质DivX视频编码，视频码率为112kbps;
+
+　　# -ovc xvid -xvidencopts bitrate=112采用XviD视频编码
+
+　　音频：动态码率，质量6 (0-9，0最好)，编码：MP3，采样：32000Hz,音频算法：7
+
+　　视频：动态码率，质量 8(0-31，0最好)，编码：xvid，尺寸：不改变大小
+
+　　CODE:
+
+　　mencoder -oac MP3lame -lameopts aq=7:vbr=2:q=6 -srate 32000 -vf harddup -ovc xvid -xvidencopts fixed_quant=8 src.avi -o dst.avi
+
+　　音频：动态码率，质量6 ，编码：MP3，采样：32000Hz,音频算法：7
+
+　　视频：动态码率，质量 8 ，编码：xvid，尺寸：320:240
+
+　　CODE:
+
+　　mencoder -oac MP3lame -lameopts aq=7:vbr=2:q=6 -srate 32000 -vf scale=320:240,harddup -ovc xvid -xvidencopts fixed_quant=8 src.avi -o dst.avi
+
+　　音频：固定码率，编码：64kbps，采样：32000Hz ,音频算法：7
+
+　　视频：动态码率，质量 4(高) ，编码：xvid
+
+　　CODE:
+
+　　mencoder -oac MP3lame -lameopts aq=7:cbr:br=64 -srate 32000 -vf harddup -ovc xvid -xvidencopts fixed_quant=4 src.avi -o dst.avi
+
+　　音频：动态码率，质量 4 (0-9，0最好)，编码：MP3，采样：32000Hz,音频算法：7
+
+　　视频：动态码率，质量 8(0-31，0最好)，编码：xvid，尺寸：原尺寸
+
+　　CODE:
+
+　　mencoder -oac MP3lame -lameopts aq=7:vbr=2:q=4 -srate 32000 -vf harddup -ovc xvid -xvidencopts fixed_quant=8 src.avi -o dst.avi
+
+ 
+
+ 
+
+B   需要的两个软件
+
+FFMPEG下载
+Mencoder最新版下载
+
+先从Mencoder这个开始，将所有格式转AVI，
+
+RMVB转AVI
+ 
+
+mencoder 1.rmvb -oac mp3lame -lameopts preset=64 -ovc xvid -xvidencopts bitrate=600 -of avi -o rmvb.avi
+
+RM转AVI
+
+mencoder 1.rm -oac mp3lame -lameopts preset=64 -ovc xvid -xvidencopts bitrate=600 -of avi -o rm.avi
+
+MPEG转AVI
+
+mencoder mp4.mpeg -oac mp3lame -lameopts preset=64 -ovc xvid -xvidencopts bitrate=600 -of avi -o mp4.avi
+
+MOV转AVI
+
+mencoder qtime.mov -oac mp3lame -lameopts preset=64 -ovc xvid -xvidencopts bitrate=600 -of avi -o qtime.avi
+
+WMV转AVI 包括WMV7到WMV9，只实验到WMV9
+
+mencoder m7.wmv -oac mp3lame -lameopts preset=64 -ovc xvid -xvidencopts bitrate=600 -of avi -o m7.avi
+
+RV转AVI
+
+mencoder 1.rv -oac mp3lame -lameopts preset=64 -ovc xvid -xvidencopts bitrate=600 -of avi -o rv.avi
+
+等等……格式，参数不变，改文件名就好了。这里参数是什么意思，我目前还不懂，学习中，你可以在网上找找，找到告诉我啊，谢谢。
+
+接下来是FFMPEG上场。
+
+AVI转FLV
+
+ffmpeg -i test.avi -ab 56 -ar 22050 -b 500 -r 15 -s 320x240 test.flv 
+
+抓图JPG。
+
+ffmpeg -i 2.wmv -y -f image2 -ss 8 -t 0.001 -s 350x240 test.jpg
+
+好，这样就实现命令行将所有格式转FLV了，我的进度只到这，接下来是应用方面的了，如何将以上的方法应用在服务器上呢，如ASP的话，用那个要WS。 SHELL什么的调用，这方面的我还在调试中，等我调试完成，我在与大家分享我的成果，谢谢。十分鄙视那些说什么已经实所有格式转FLV，还要收费的， 靠。资源要共享，我们才能发展，以后我们自己开发CPU，开发操作系统。
+
+ 
+
+C    ◆Linux下的视频转换：mencoder
+
+制作适合在智能手机和PDA上观看的mpeg4视频。
+
+Linux上有一个很强大的视频音频转换软件，就是Mplayer自带的mencoder (MPlayer's Movie Encoder)。mencoder就象是一台全手动的照相机，可调整的选项非常多，不过这儿只是把最常见的情况说一下。
+
+转换avi文件，并把字幕内嵌到视频中。首先假设一下下列的条件：
+
+文件名：video.avi
+
+字幕文件名：video.srt
+
+目标文件：new.avi
+
+目标文件格式：mpeg4
+
+目标文件视频码率：200
+
+目标文件音频码率：64
+
+目标文件分辨率： 320：240
+
+制作内嵌字幕所需的字体：simsun.ttf
+
+（上面各项都可以根据实际情况进行调整）
+
+转换命令如下：
+
+mencoder-oac mp3lame -lameopts vbr=3:br=64 -ovc lavc -lavcoptsvcodec=mpeg4:mbd=1:vbitrate=200 -sub video.srt -o new.avi -fontsimsun.ttf video.avi -subcp cp936 -subfont-text-scale 4 -vfscale=320:240
+
+各选项的含义：
+
+-oac 编码文件的音频部分。这儿是用lame将音频encode成mp3,即mp3lame。其他可用的选项可以调用mencoder的man page查看。
+
+-lameopts 顾名思义，即lame选项，这儿只需定义一下码率就可以了。
+
+vbr 设定音频码率的方法，格式为vbr=<0-4>
+
+0 cbr average bitrate
+
+1 mt
+
+2 rh constant bitrate Also forces CBR mode encoding on subsequent ABR presets modes.
+
+3 abr
+
+4 mtrh
+
+在这儿用的是3,abr。
+
+br 就是设定我们所需要的码率值，格式为br=<0-1024>，只能在vbr为0和3的情况下才能使用该选项。
+
+-ovc 编码文件的视频部分。主要有以下几个选项
+
+-ovc copy
+
+不进行编码，只是复制视频流
+
+-ovc divx4
+
+编码成DivX4/DivX5
+
+-ovc raw
+
+编码成任意不压缩的格式（用‘-vf format’设定具体的格式）
+
+-ovc lavc
+
+使用libavcodec进行编码
+
+-lavcopts 就是libavcodec的选项。
+
+vcodec=使用指定的视频编码，下面列一下几个主要的值
+
+h264
+
+H.264
+
+h263
+
+H.263
+
+h263p
+
+H.263+
+
+mpeg4
+
+MPEG-4 (DivX 4/5)
+
+msmpeg4
+
+DivX 3
+
+msmpeg4v2
+
+MS MPEG4v2
+
+wmv1
+
+Windows Media Video, version 1 (又称 WMV7)
+
+wmv2
+
+Windows Media Video, version 2 (又称 WMV8)
+
+rv10
+
+旧的RealVideo格式
+
+mpeg1video
+
+MPEG-1 video
+
+mpeg2video
+
+MPEG-2 video
+
+mbd 决定视频宏块的算法，这儿只需要mbd=1即可。其余的可以查看man page。
+
+vbitrate 设定视频的码率（默认为800）。
+
+-sub 设定字幕文件
+
+-o 目标视频文件
+
+-font 制作内嵌字幕所需字体的路径
+
+-subcp 字幕的编码，简体中文就是cp936
+
+-subfont-text-scale 字幕字体的大小
+
+-vf scale 视频的分辨率
+
+如果不需要将字幕内嵌入视频文件，只需要去掉-sub、-font、-subcp、-subfont-text-scale这几个选项。将rmvb转换成mpeg4也是如此。
+
+◆Linux下的视频转换：ffmpeg
+
+格式：ffmpeg [[输入文件选项]- i 输入文件名] {[输入文件选项] 输出文件名}
+
+主要选项：
+
+-L 显示ffmpeg的版权说明
+
+-h 显示帮助
+
+-version 显示版本
+
+-formats 显示支持的文件格式，编码和协议
+
+-f 格式名 强制使用格式
+
+-img 文件格式名 强制使用片格式
+
+-i 文件名 待转换文件名字
+
+-y 覆盖同名输出文件
+
+-t 时间 设置影片时间长度
+
+-fs 最大尺寸 设置文件的最大尺寸
+
+-ss 时间点 设置开始转换的时间点
+
+-title 文字 设置标题
+
+-author 文字 设置作者
+
+-copyright 文字 设置版权声明
+
+-comment 文字 设置备注
+
+视频选项：
+
+-b 比特率 设置文件比特率 (单位是kbit/s)
+
+-r 速度 桢速度 (Hz value)
+
+-s 大小 设置大小，宽乘高
+
+-newvideo 在现在的视频流后面加入信的视频流
+
+Audio options:
+
+-aframes 数字 设置转换多少桢(frame)的音频
+
+-ab bitrate 设置音乐的比特率(单位：kbit/s)
+
+-aq 质量 这只音频质量 (指定编码)
+
+-ar 采样率 设置音频采样率 (单位：Hz)
+
+-ac 声道数字 设置声道数
+
+-an 取消音频
+
+-acodec 编码 强制音频 编码 ('copy' to copy stream)
+
+-vol volume 改变音量 (256为普通)
+
+-newaudio 追加音乐

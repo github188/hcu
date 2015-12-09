@@ -1,0 +1,1294 @@
+http://www.doc88.com/p-9542702232225.html
+http://blog.csdn.net/bingqingsuimeng/article/details/8475841
+http://blog.csdn.net/iccome/article/details/16878795
+
+ Linux音频编程-OSS编程-alsa编程   .
+
+
+2013-01-07 10:38 2398人阅读 评论(0) 收藏 举报 
+.
+
+ 分类： 
+
+
+linux驱动程序之-音频子系统（ASOC）（26）   
+
+
+. 
+
+虽说alsa的API才是Linux音频编程的未来，但是alsa和OSS相兼容的接口正是我们编程时用到最多的。。.
+
+
+特此献上。。
+
+OSS（Open Sound System）是 unix 平台上一个统一的音频接口, 即只要音频处理应用程序按照OSS的API来编写，那么在移植到另外一个平台时，只需要重新编译即可。
+OSS（Open Sound System）是unix平台上一个统一的音频接口。以前，每个Unix厂商都会提供一个自己专有的API，用来处理音频。这就意味着为一种Unix平台 编写的音频处理应用程序，在移植到另外一种Unix平台上时，必须要重写。不仅如此，在一种平台上具备的功能，可能在另外一个平台上无法实现。但是， OSS出现以后情况就大不一样了，只要音频处理应用程序按照OSS的API来编写，那么在移植到另外一个平台时，只需要重新编译即可。因此，OSS提供了 源代码级的可移植性。
+ 同时，很多的Unix工作站中，只能提供录音与放音的功能。有了OSS后，给这 些工作站带来了 MIDI功能，加上音频流、语音识别/生成、计算机电话（CT）、JAVA以及其它的多媒体技术，在Unix工作站中，同样可以享受到同Windows、 Macintosh环境一样的音频世界。另外，OSS还提供了与视频和动画播放同步的音频能力，这对在Unix中实现动画、游戏提供了帮助。
+ 本文首先解释在音频编程时经常遇到的名词、设备文件的含义，然后分别在录音、播放、Mixer方面对OSS接口的使用方法进行介绍。由于OSS API十分丰富，因此在本文中只介绍那些最为常用的接口。对于OSS API的一个完整描述，可以参考[1]。
+一、基础知识
+ 数字音频设备（有时也称codec，PCM，DSP，ADC/DAC设备）：播放或录制数字化的声音。它的指标主要有：采样速率（电话为8K，DVD为96K）、channel数目（单声道，立体声）、采样分辨率（8-bit，16-bit）。
+mixer（混频器）：用来控制多个输入、输出的音量，也控制输入（microphone，line-in，CD）之间的切换。
+synthesizer（合成器）：通过一些预先定义好的波形来合成声音，有时用在游戏中声音效果的产生。
+MIDI 接口：MIDI接口是为了连接舞台上的synthesizer、键盘、道具、灯光控制器的一种串行接口。
+ 在Unix系统中，所有的设备都被统一成文件，通过对文件的访问方式（首先open，然后read/write，同时可以使用ioctl读取/设置参数，最后close）来访问设备。
+
+在OSS中，主要有以下的几种设备文件：
+/dev/mixer：访问声卡中内置的mixer，调整音量大小，选择音源。
+/dev/sndstat：测试声卡，执行cat /dev/sndstat会显示声卡驱动的信息。
+/dev/dsp 、/dev/dspW、/dev/audio：读这个设备就相当于录音，写这个设备就相当于放音。/dev/dsp与/dev/audio之间的区别在于 采样的编码不同，/dev/audio使用μ律编码，/dev/dsp使用8-bit（无符号）线性编码，/dev/dspW使用16-bit（有符号） 线形编码。/dev/audio主要是为了与SunOS兼容，所以尽量不要使用。
+/dev/sequencer：访问声卡内置的，或者连接在MIDI接口的synthesizer。这些设备文件的设备编号见[1]。
+二、音频编程
+OSS为音频编程提供三种设备，分别是/dev/dsp，/dev/dspW和/dev/audio，前面已经提到了它们之间的区别。
+ 用户可以直接使用Unix的命令来放音和录音，命令cat /dev/dsp >xyz可用来录音，录音的结果放在xyz文件中；命令cat xyz >/dev/dsp播放声音文件xyz。
+ 如果通过编程的方式来使用这些设备，那么Unix平台通过文件系统提供了统一的访问 接口。程序员可以通过文件的操作函数直接控制这些设备，这些操作函数包括：open、close、read、write、ioctl等。下面我们就分别讨 论打开音频设备、放音、录音和参数调整。
+1. 打开音频设备
+1) 头文件定义
+1./* * Standard includes */ 
+2.#include <ioctl.h> 
+3.#include <unistd.h> 
+4.#include <fcntl.h> 
+5.#include <sys/soundcard.h> 
+6./* * Mandatory variables. */ 
+7.#define BUF_SIZE 4096 
+8.int audio_fd; 
+9.unsigned char audio_buffer[BUF_SIZE]; 
+
+
+2) 打开设备
+1.if ((audio_fd = open(DEVICE_NAME, open_mode, 0)) ==-1) 
+2.{ 
+3./* Open of device failed */ 
+4.perror(DEVICE_NAME); exit(1); 
+5.} 
+
+
+open_mode有三种选择：O_RDONLY，O_WRONLY和O_RDWR，分别表示只读、只写和读写。OSS建议尽量使用只读或只写，只有在全双工的情况下（即录音和放音同时）才使用读写模式。
+2. 录音
+1.int len; 
+2.if ((len = read(audio_fd, audio_buffer, count)) == -1) 
+3.{ 
+4.perror("audio read"); exit(1); 
+5.} 
+
+
+count为录音数据的字节个数（建议为2的指数），但不能超过audio_buffer的 大小。从读字节的个数可以精确的测量时间，例如8kHZ 16-bit stereo的速率为8000*2*2=32000bytes/second，这是知道何时停止录音的唯一方法。
+3. 放音
+ 放音实际上和录音很类似，只不过把read改成write即可，相应的audio_buffer中为音频数据，count为数据的长度。
+ 注意，用户始终要读/写一个完整的采样。例如一个16-bit的立体声模式下，每个采样有4个字节，所以应用程序每次必须读/写4的倍数个字节。
+ 另外，由于OSS是一个跨平台的音频接口，所以用户在编程的时候，要考虑到可移植性的问题，其中一个重要的方面是读/写时的字节顺序。
+4. 设置参数
+设置采样格式
+1.int format; 
+2.format = AFMT_S16_LE; 
+3.if (ioctl(audio_fd, SNDCTL_DSP_SETFMT, &format) == -1) 
+4.{ 
+5./* fatal error */ 
+6.perror("SNDCTL_DSP_SETFMT"); 
+7.exit(1); 
+8.} 
+9.if (format != AFMT_S16_LE) 
+10.{ 
+11./* 本设备不支持选择的采样格式. */ 
+12.} 
+
+
+在设置采样格式之前，可以先测试设备能够支持那些采样格式，方法如下：
+1.int mask; 
+2.if (ioctl(audio_fd, SNDCTL_DSP_GETFMTS, &mask) == -1) 
+3.{ 
+4./* Handle fatal error ... */ 
+5.} 
+6.if (mask & AFMT_MPEG) 
+7.{ 
+8./* 本设备支持MPEG采样格式 ... */ 
+9.} 
+
+
+设置通道数目
+1.int channels = 2; 
+2./* 1=mono, 2=stereo */ 
+3.if (ioctl(audio_fd, SNDCTL_DSP_CHANNELS, &channels) == -1) 
+4.{ 
+5./* Fatal error */ 
+6.perror("SNDCTL_DSP_CHANNELS"); 
+7.exit(1); 
+8.} 
+9.if (channels != 2) 
+10.{ 
+11./* 本设备不支持立体声模式 ... */ 
+12.} 
+
+
+
+设置采样速率
+1.int speed = 11025; 
+2.if (ioctl(audio_fd, SNDCTL_DSP_SPEED, &speed)==-1) 
+3.{ 
+4./* Fatal error */ 
+5.perror("SNDCTL_DSP_SPEED"); 
+6.exit(Error code); 
+7.} 
+8.if ( /* 返回的速率（即硬件支持的速率）与需要的速率差别很大... */ ) { /* 本设备不支持需要的速率... */ } 
+
+
+音频设备通过分频的方法产生需要的采样时钟，因此不可能产生所有的频率。驱动程序会计算出最接近要求的频率来，用户程序要检查返回的速率值，如果误差较小，可以忽略，但误差不能太大。
+三、Mixer编程
+ 对Mixer 的控制，包括调节音量（volume）、选择录音音源（microphone，line-in）、查询mixer的功能和状态，主要是通过Mixer设备 /dev/mixer的ioctl接口。相应的，ioctl接口提供的功能也分为三类：调节音量、查询mixer的能力、选择mixer的录音通道。下面 就分别介绍使用的方法：
+ 下面的mixer_fd是对mixer设备执行open操作返回的文件描述符。
+调节音量
+ 应用程序通过ioctl的SOUND_MIXER_READ和SOUND_MIXER_WIRTE功能号来读取/设置音量。在OSS中，音量的大小范围在0-100之间。使用方法如下：
+1.int vol; 
+2.if (ioctl(mixer_fd, SOUND_MIXER_READ(SOUND_MIXER_MIC), &vol) == -1) 
+3.{ 
+4./* 访问了没有定义的mixer通道... */ 
+
+
+SOUND_MIXER_MIC 是通道参数，表示读microphone通道的音量，结果放置在vol中。如果通道是立体声，那么vol的最低有效字节为左声道的音量值，接着的字节为右 声道的音量值，另外的两个字节不用。如果通道是单声道，vol中左声道与右声道具有相同的值。
+查询mixer的能力
+1.int mask; 
+2.if (ioctl(mixer_fd, SOUND_MIXER_READ_xxxx, &mask) == -1) 
+3.{ /* Mixer 的没有此能力... */ } 
+
+
+SOUND_MIXER_READ_xxxx 中的xxxx代表具体要查询的内容，比如检查可用的mixer通道用SOUND_MIXER_READ_DEVMASK；检查可用的录音设备，用 SOUND_MIXER_READ_RECMASK；检查单声道/立体声，用SOUND_MIXER_READ_STEREODEVS；检查mixer的 一般能力，用SOUND_MIXER_READ_CAPS等等。所有通道的查询的结果都放在mask中，所以要区分出特定通道的状况，使用 mask& （1 << channel_no）。
+选择mixer的录音通道
+ 首先可以通过SOUND_MIXER_READ_RECMASK检查可用的录音通道，然后通过SOUND_MIXER_WRITE_RECSRC选择录音通道。可以随时通过SOUND_MIXER_READ_RECSRC查询当前声卡中已经被选择的录音通道。
+OSS建议把mixer的用户控制功能单独出来形成一个通用的程序。但前提是，在使用mixer之前，首先通过API的查询功能检查声卡的能力。在linux中，就有一个专门的mixer程序--aumix。
+四、结束语
+ 前面讨论的是OSS中一些最基本的内容，实际上OSS中还有很多高级的特性，比如在音频编程时十分重要的实时性问题，画面与声音的同步问题，这里都没有介绍。如果读者对这些特性感兴趣的话，可以进一步参考[1]。另外，在[2]中，还可以下载使用OSS接口的样例程序。
+
+ 
+ 
+ 
+ 
+ =====
+ 【Linux&音频】Alsa音频编程【精华】   .
+
+
+2013-11-22 09:55 1592人阅读 评论(0) 收藏 举报 
+.
+
+ 分类： 
+
+
+技术借鉴（11）   
+
+
+
+嵌入式-linux（2）   
+
+
+. 
+
+ 
+【Linux&音频】Alsa音频编程【精华】 
+.
+ 
+
+
+
+前序：这里了解一下各个参数的含义以及一些基本概念。
+
+
+
+
+样本长度(sample)：样本是记录音频数据最基本的单位，常见的有8位和16位。
+
+通道数(channel)：该参数为1表示单声道，2则是立体声。
+桢(frame)：桢记录了一个声音单元，其长度为样本长度与通道数的乘积。
+ 采样率(rate)：每秒钟采样次数，该次数是针对桢而言。
+ 周期(period)：音频设备一次处理所需要的桢数，对于音频设备的数据访问以及音频数据的存储，都是以此为单位。
+ 
+交错模式(interleaved)：是一种音频数据的记录方式，在交错模式下，数据以连续桢的形式存放，即首先记录完桢1的左声道样本和右声道样本（假设为立体声格式），再开始桢2的记录。而在非交错模式下，首先记录的是一个周期内所有桢的左声道样本，再记录右声道样本，数据是以连续通道的方式存储。不过多数情况下，我们只需要使用交错模式就可以了。
+period(周期):硬件中中断间的间隔时间。它表示输入延时。
+
+ 
+声卡接口中有一个指针来指示声卡硬件缓存区中当前的读写位置。只要接口在运行，这个指针将循环地指向缓存区中的某个位置。
+frame size = sizeof(one sample) * nChannels
+alsa中配置的缓存(buffer)和周期(size)大小在runtime中是以帧(frames)形式存储的。
+period_bytes = frames_to_bytes(runtime, runtime->period_size); 
+bytes_to_frames()
+
+
+
+
+一，ALSA声音编程介绍
+
+ALSA表示高级Linux声音体系结构(Advanced Linux Sound Architecture)。它由一系列内核驱动，应用程序编译接口(API)以及支持Linux下声音的实用程序组成。这篇文章里，我将简单介绍 ALSA项目的基本框架以及它的软件组成。主要集中介绍PCM接口编程，包括您可以自动实践的程序示例。
+
+ 您使用ALSA的原因可能就是因为它很新，但它并不是唯一可用的声音API。如果您想完成低级的声音操作，以便能够最大化地控制声音并最大化地提高性能，或者如果您使用其它声音API没有的特性，那么ALSA是很好的选择。如果您已经写了一个音频程序，你可能想要为ALSA声卡驱动添加本地支持。如果您对音频不感兴趣，只是想播放音频文件，那么高级的API将是更好的选择，比如SDL,OpenAL以及那些桌面环境提供的工具集。另外，您只能在有ALSA 支持的Linux环境中使用ALSA。
+
+ 二，ALSA历史
+
+ALSA项目发起的起因是Linux下的声卡驱动(OSS/Free drivers)没有得到积极的维护。并且落后于新的声卡技术。Jaroslav Kysela早先写了一个声卡驱动，并由此开始了ALSA项目，随便，更多的开发者加入到开发队伍中，更多的声卡得到支持，API的结构也得到了重组。
+
+Linux内核2.5在开发过程中，ALSA被合并到了官方的源码树中。在发布内核2.6后，ALSA已经内建在稳定的内核版本中并将广泛地使用。
+
+ 三，数字音频基础
+
+声音由变化的气压组成。它被麦克风这样的转换器转换成电子形式。模/数(ADC)转换器将模拟电压转换成离散的样本值。声音以固定的时间间隔被采样，采样的速率称为采样率。把样本输出到数/模(DAC)转换器，比如扩音器，最后转换成原来的模拟信号。
+
+样本大小以位来表示。样本大小是影响声音被转换成数字信号的精确程度的因素之一。另一个主要的因素是采样率。奈奎斯特(Nyquist)理论中，只要离散系统的奈奎斯特频率高于采样信号的最高频率或带宽，就可以避免混叠现象。
+
+ 四，ALSA基础
+
+ALSA由许多声卡的声卡驱动程序组成，同时它也提供一个称为libasound的API库。应用程序开发者应该使用libasound而不是内核中的 ALSA接口。因为libasound提供最高级并且编程方便的编程接口。并且提供一个设备逻辑命名功能，这样开发者甚至不需要知道类似设备文件这样的低层接口。相反，OSS/Free驱动是在内核系统调用级上编程，它要求开发者提供设备文件名并且利用ioctrl来实现相应的功能。
+
+为了向后兼容，ALSA提供内核模块来模拟OSS，这样之前的许多在OSS基础上开发的应用程序不需要任何改动就可以在ALSA上运行。另外，libaoss库也可以模拟OSS，而它不需要内核模块。
+
+ALSA包含插件功能，使用插件可以扩展新的声卡驱动，包括完全用软件实现的虚拟声卡。ALSA提供一系列基于命令行的工具集，比如混音器(mixer)，音频文件播放器(aplay)，以及控制特定声卡特定属性的工具。
+
+ 五，ALSA体系结构
+
+ALSA API可以分解成以下几个主要的接口：
+
+1 控制接口：提供管理声卡注册和请求可用设备的通用功能 
+
+
+2 PCM接口：管理数字音频回放(playback)和录音(capture)的接口。本文后续总结重点放在这个接口上，因为它是开发数字音频程序最常用到的接口。
+
+3 Raw MIDI接口:支持MIDI(Musical Instrument Digital Interface),标准的电子乐器。这些API提供对声卡上MIDI总线的访问。这个原始接口基于MIDI事件工作，由程序员负责管理协议以及时间处理。
+
+4 定时器(Timer)接口：为同步音频事件提供对声卡上时间处理硬件的访问。
+
+5 时序器(Sequencer)接口
+
+6 混音器(Mixer)接口
+
+ 六，设备命名
+
+API库使用逻辑设备名而不是设备文件。设备名字可以是真实的硬件名字也可以是插件名字。硬件名字使用hw:i,j这样的格式。其中i是卡号，j是这块声卡上的设备号。
+
+第一个声音设备是hw:0,0.这个别名默认引用第一块声音设备并且在本文示例中一真会被用到。
+
+插件使用另外的唯一名字，比如 plughw:,表示一个插件，这个插件不提供对硬件设备的访问，而是提供像采样率转换这样的软件特性，硬件本身并不支持这样的特性。
+
+ 七，声音缓存和数据传输
+
+每个声卡都有一个硬件缓存区来保存记录下来的样本。当缓存区足够满时，声卡将产生一个中断。内核声卡驱动然后使用直接内存(DMA)访问通道将样本传送到内存中的应用程序缓存区。类似地，对于回放，任何应用程序使用DMA将自己的缓存区数据传送到声卡的硬件缓存区中。
+ 这样硬件缓存区是环缓存。也就是说当数据到达缓存区末尾时将重新回到缓存区的起始位置。ALSA维护一个指针来指向硬件缓存以及应用程序缓存区中数据操作的当前位置。从内核外部看，我们只对应用程序的缓存区感兴趣，所以本文只讨论应用程序缓存区。
+
+
+应用程序缓存区的大小可以通过ALSA库函数调用来控制。缓存区可以很大，一次传输操作可能会导致不可接受的延迟，我们把它称为延时(latency)。为了解决这个问题，ALSA将缓存区拆分成一系列周期(period)(OSS/Free中叫片断fragments).ALSA以period为单元来传送数据。
+
+一个周期(period)存储一些帧(frames)。每一帧包含时间上一个点所抓取的样本。对于立体声设备，一个帧会包含两个信道上的样本。分解过程：一个缓存区分解成周期，然后是帧，然后是样本。左右信道信息被交替地存储在一个帧内。这称为交错 (interleaved)模式。在非交错模式中，一个信道的所有样本数据存储在另外一个信道的数据之后。
+
+
+八，Over and Under Run
+
+当一个声卡活动时，数据总是连续地在硬件缓存区和应用程序缓存区间传输。但是也有例外。在录音例子中，如果应用程序读取数据不够快，循环缓存区将会被新的数据覆盖。这种数据的丢失被称为over run.在回放例子中，如果应用程序写入数据到缓存区中的速度不够快，缓存区将会"饿死"。这样的错误被称为"under run"。在ALSA文档中，有时将这两种情形统称为"XRUN"。适当地设计应用程序可以最小化XRUN并且可以从中恢复过来。
+
+ 
+九，一个典型的声音程序
+
+使用PCM的程序通常类似下面的伪代码：
+
+
+打开回放或录音接口
+
+
+设置硬件参数(访问模式，数据格式，信道数，采样率，等等)
+while 有数据要被处理：
+ 
+读PCM数据(录音)
+
+或 写PCM数据(回放)
+
+
+关闭接口
+
+
+
+
+和本文相关的所有实例清单可以从FTP中获取：ftp.ssc.com/pub/lj/listings/issue126/6735.tgz。
+
+Listing 1. Display Some PCM Types and Formats
+
+
+
+
+[html]  view plaincopyprint?
+01.#include <alsa/asoundlib.h> 
+02.
+03.int main() 
+04.{ 
+05.int val; 
+06.
+07.printf("ALSA library version: %s\n", 
+08.SND_LIB_VERSION_STR); 
+09.
+10.printf("\nPCM stream types:\n"); 
+11.for (val =  0; val <= SND_PCM_STREAM_LAST; val++) 
+12.printf(" %s\n", 
+13.snd_pcm_stream_name((snd_pcm_stream_t)val)); 
+14.
+15.printf("\nPCM access types:\n"); 
+16.for (val = 0; val <= SND_PCM_ACCESS_LAST; val++) 
+17.{ 
+18.printf(" %s\n", 
+19.snd_pcm_access_name((snd_pcm_access_t)val)); 
+20.} 
+21.
+22.printf("\nPCM formats:\n"); 
+23.for (val =  0; val <= SND_PCM_FORMAT_LAST; val++) 
+24.{ 
+25.if (snd_pcm_format_name((snd_pcm_format_t)val)!= NULL)  
+26.{ 
+27.printf(" %s (%s)\n", 
+28.snd_pcm_format_name((snd_pcm_format_t)val), 
+29.snd_pcm_format_description( 
+30.(snd_pcm_format_t)val)); 
+31.} 
+32.} 
+33.printf("\nPCM subformats:\n"); 
+34.for (val = 0; val <= SND_PCM_SUBFORMAT_LAST;val++) 
+35.{ 
+36.printf(" %s (%s)\n", 
+37.snd_pcm_subformat_name(( 
+38.snd_pcm_subformat_t)val), 
+39.snd_pcm_subformat_description(( 
+40.snd_pcm_subformat_t)val)); 
+41.} 
+42.printf("\nPCM states:\n"); 
+43.for (val =  0; val <= SND_PCM_STATE_LAST; val++) 
+44.printf(" %s\n", 
+45.snd_pcm_state_name((snd_pcm_state_t)val)); 
+46.
+47.return 0; 
+48.} 
+
+
+
+[html] view plaincopyprint?在CODE上查看代码片派生到我的代码片
+01.#include <alsa/asoundlib.h>  
+02.  
+03.int main()   
+04.{  
+05.    int val;  
+06.  
+07.    printf("ALSA library version: %s\n",  
+08.                       SND_LIB_VERSION_STR);  
+09.  
+10.    printf("\nPCM stream types:\n");  
+11.    for (val = 0; val <= SND_PCM_STREAM_LAST; val++)  
+12.            printf(" %s\n",  
+13.                snd_pcm_stream_name((snd_pcm_stream_t)val));  
+14.  
+15.    printf("\nPCM access types:\n");  
+16.    for (val = 0; val <= SND_PCM_ACCESS_LAST; val++)  
+17.    {  
+18.            printf(" %s\n",  
+19.                snd_pcm_access_name((snd_pcm_access_t)val));  
+20.    }  
+21.  
+22.    printf("\nPCM formats:\n");  
+23.    for (val = 0; val <= SND_PCM_FORMAT_LAST; val++)  
+24.        {  
+25.        if (snd_pcm_format_name((snd_pcm_format_t)val)!= NULL)  
+26.        {  
+27.                printf(" %s (%s)\n",  
+28.                    snd_pcm_format_name((snd_pcm_format_t)val),  
+29.                    snd_pcm_format_description(  
+30.                            (snd_pcm_format_t)val));  
+31.        }  
+32.    }  
+33.    printf("\nPCM subformats:\n");  
+34.    for (val = 0; val <= SND_PCM_SUBFORMAT_LAST;val++)  
+35.        {  
+36.        printf(" %s (%s)\n",  
+37.                snd_pcm_subformat_name((  
+38.                snd_pcm_subformat_t)val),  
+39.                snd_pcm_subformat_description((  
+40.                snd_pcm_subformat_t)val));  
+41.    }  
+42.    printf("\nPCM states:\n");  
+43.    for (val = 0; val <= SND_PCM_STATE_LAST; val++)  
+44.            printf(" %s\n",  
+45.                snd_pcm_state_name((snd_pcm_state_t)val));  
+46.  
+47.    return 0;  
+48.}  
+
+
+
+
+
+
+
+清单一显示了一些ALSA使用的PCM数据类型和参数。首先需要做的是包括头文件。这些头文件包含了所有库函数的声明。其中之一就是显示ALSA库的版本。
+
+这个程序剩下的部分的迭代一些PCM数据类型，以流类型开始。ALSA为每次迭代的最后值提供符号常量名，并且提供功能函数以显示某个特定值的描述字符串。你将会看到，ALSA支持许多格式，在我的1.0.15版本里，支持多达36种格式。
+
+这个程序必须链接到alsalib库，通过在编译时需要加上-lasound选项。有些alsa库函数使用dlopen函数以及浮点操作，所以您可能还需要加上-ldl,-lm选项。
+
+编译：gcc -o main test.c -lasound
+
+
+下面是该程序的Makefile:
+
+ Listing 2. Opening PCM Device and Setting Parameters
+
+
+
+
+[html]  view plaincopyprint?
+01./* 
+02.
+03.This example opens the default PCM device, sets 
+04.some parameters, and then displays the value 
+05.of most of the hardware parameters. It does not 
+06.perform any sound playback or recording. 
+07.
+08.*/ 
+09.
+10./* Use the newer ALSA API */ 
+11.#define ALSA_PCM_NEW_HW_PARAMS_API 
+12.
+13./* All of the ALSA library API is defined 
+14.* in this header */ 
+15.#include <alsa/asoundlib.h> 
+16.
+17.int main() { 
+18.int rc; 
+19.snd_pcm_t *handle; 
+20.snd_pcm_hw_params_t *params; 
+21.unsigned int val, val2; 
+22.int dir; 
+23.snd_pcm_uframes_t frames; 
+24.
+25./* Open PCM device for playback. */ 
+26.rc = snd_pcm_open(&handle, "default", 
+27.SND_PCM_STREAM_PLAYBACK, 0); 
+28.if (rc < 0) { 
+29.fprintf(stderr, 
+30."unable to open pcm device: %s\n", 
+31.snd_strerror(rc)); 
+32.exit(1); 
+33.} 
+34.
+35./* Allocate a hardware parameters object. */ 
+36.snd_pcm_hw_params_alloca(¶ms); 
+37.
+38./* Fill it in with default values. */ 
+39.snd_pcm_hw_params_any(handle, params); 
+40.
+41./* Set the desired hardware parameters. */ 
+42.
+43./* Interleaved mode */ 
+44.snd_pcm_hw_params_set_access(handle, params, 
+45.SND_PCM_ACCESS_RW_INTERLEAVED); 
+46.
+47./* Signed 16-bit little-endian format */ 
+48.snd_pcm_hw_params_set_format(handle, params, 
+49.SND_PCM_FORMAT_S16_LE); 
+50.
+51./* Two channels (stereo) */ 
+52.snd_pcm_hw_params_set_channels(handle, params, 2); 
+53.
+54./* 44100 bits/second sampling rate (CD quality) */ 
+55.val = 44100; 
+56.snd_pcm_hw_params_set_rate_near(handle, 
+57.params, &val, &dir); 
+58.
+59./* Write the parameters to the driver */ 
+60.rc = snd_pcm_hw_params(handle, params); 
+61.if (rc < 0) { 
+62.fprintf(stderr, 
+63."unable to set hw parameters: %s\n", 
+64.snd_strerror(rc)); 
+65.exit(1); 
+66.} 
+67.
+68./* Display information about the PCM interface */ 
+69.
+70.printf("PCM handle name =  '%s'\n", 
+71.snd_pcm_name(handle)); 
+72.
+73.printf("PCM state = %s\n", 
+74.snd_pcm_state_name(snd_pcm_state(handle))); 
+75.
+76.snd_pcm_hw_params_get_access(params, 
+77.(snd_pcm_access_t *) &val); 
+78.printf("access type = %s\n", 
+79.snd_pcm_access_name((snd_pcm_access_t)val)); 
+80.
+81.snd_pcm_hw_params_get_format(params, &val); 
+82.printf("format = '%s' (%s)\n", 
+83.snd_pcm_format_name((snd_pcm_format_t)val), 
+84.snd_pcm_format_description( 
+85.(snd_pcm_format_t)val)); 
+86.
+87.snd_pcm_hw_params_get_subformat(params, 
+88.(snd_pcm_subformat_t *)&val); 
+89.printf("subformat = '%s' (%s)\n", 
+90.snd_pcm_subformat_name((snd_pcm_subformat_t)val), 
+91.snd_pcm_subformat_description( 
+92.(snd_pcm_subformat_t)val)); 
+93.
+94.snd_pcm_hw_params_get_channels(params, &val); 
+95.printf("channels = %d\n", val); 
+96.
+97.snd_pcm_hw_params_get_rate(params, &val, &dir); 
+98.printf("rate = %d bps\n", val); 
+99.
+100.snd_pcm_hw_params_get_period_time(params, 
+101.&val, &dir); 
+102.printf("period time = %d us\n", val); 
+103.
+104.snd_pcm_hw_params_get_period_size(params, 
+105.&frames, &dir); 
+106.printf("period size = %d frames\n", (int)frames); 
+107.
+108.snd_pcm_hw_params_get_buffer_time(params, 
+109.&val, &dir); 
+110.printf("buffer time = %d us\n", val); 
+111.
+112.snd_pcm_hw_params_get_buffer_size(params, 
+113.(snd_pcm_uframes_t *) &val); 
+114.printf("buffer size = %d frames\n", val); 
+115.
+116.snd_pcm_hw_params_get_periods(params, &val, &dir); 
+117.printf("periods per buffer = %d frames\n", val); 
+118.
+119.snd_pcm_hw_params_get_rate_numden(params, 
+120.&val, &val2); 
+121.printf("exact rate = %d/%d bps\n", val, val2); 
+122.
+123.val = snd_pcm_hw_params_get_sbits(params); 
+124.printf("significant bits = %d\n", val); 
+125.
+126.snd_pcm_hw_params_get_tick_time(params, 
+127.&val, &dir); 
+128.printf("tick time = %d us\n", val); 
+129.
+130.val = snd_pcm_hw_params_is_batch(params); 
+131.printf("is batch = %d\n", val); 
+132.
+133.val = snd_pcm_hw_params_is_block_transfer(params); 
+134.printf("is block transfer = %d\n", val); 
+135.
+136.val = snd_pcm_hw_params_is_double(params); 
+137.printf("is double = %d\n", val); 
+138.
+139.val = snd_pcm_hw_params_is_half_duplex(params); 
+140.printf("is half duplex = %d\n", val); 
+141.
+142.val = snd_pcm_hw_params_is_joint_duplex(params); 
+143.printf("is joint duplex = %d\n", val); 
+144.
+145.val = snd_pcm_hw_params_can_overrange(params); 
+146.printf("can overrange = %d\n", val); 
+147.
+148.val = snd_pcm_hw_params_can_mmap_sample_resolution(params); 
+149.printf("can mmap = %d\n", val); 
+150.
+151.val = snd_pcm_hw_params_can_pause(params); 
+152.printf("can pause = %d\n", val); 
+153.
+154.val = snd_pcm_hw_params_can_resume(params); 
+155.printf("can resume = %d\n", val); 
+156.
+157.val = snd_pcm_hw_params_can_sync_start(params); 
+158.printf("can sync start = %d\n", val); 
+159.
+160.snd_pcm_close(handle); 
+161.
+162.return 0; 
+163.} 
+
+
+
+[html] view plaincopyprint?在CODE上查看代码片派生到我的代码片
+01./*  
+02.  
+03.This example opens the default PCM device, sets  
+04.some parameters, and then displays the value  
+05.of most of the hardware parameters. It does not  
+06.perform any sound playback or recording.  
+07.  
+08.*/  
+09.  
+10./* Use the newer ALSA API */  
+11.#define ALSA_PCM_NEW_HW_PARAMS_API  
+12.  
+13./* All of the ALSA library API is defined  
+14.* in this header */  
+15.#include <alsa/asoundlib.h>  
+16.  
+17.int main() {  
+18.int rc;  
+19.snd_pcm_t *handle;  
+20.snd_pcm_hw_params_t *params;  
+21.unsigned int val, val2;  
+22.int dir;  
+23.snd_pcm_uframes_t frames;  
+24.  
+25./* Open PCM device for playback. */  
+26.rc = snd_pcm_open(&handle, "default",  
+27.                    SND_PCM_STREAM_PLAYBACK, 0);  
+28.if (rc < 0) {  
+29.    fprintf(stderr,  
+30.            "unable to open pcm device: %s\n",  
+31.            snd_strerror(rc));  
+32.    exit(1);  
+33.}  
+34.  
+35./* Allocate a hardware parameters object. */  
+36.snd_pcm_hw_params_alloca(¶ms);  
+37.  
+38./* Fill it in with default values. */  
+39.snd_pcm_hw_params_any(handle, params);  
+40.  
+41./* Set the desired hardware parameters. */  
+42.  
+43./* Interleaved mode */  
+44.snd_pcm_hw_params_set_access(handle, params,  
+45.                      SND_PCM_ACCESS_RW_INTERLEAVED);  
+46.  
+47./* Signed 16-bit little-endian format */  
+48.snd_pcm_hw_params_set_format(handle, params,  
+49.                              SND_PCM_FORMAT_S16_LE);  
+50.  
+51./* Two channels (stereo) */  
+52.snd_pcm_hw_params_set_channels(handle, params, 2);  
+53.  
+54./* 44100 bits/second sampling rate (CD quality) */  
+55.val = 44100;  
+56.snd_pcm_hw_params_set_rate_near(handle,  
+57.                                 params, &val, &dir);  
+58.  
+59./* Write the parameters to the driver */  
+60.rc = snd_pcm_hw_params(handle, params);  
+61.if (rc < 0) {  
+62.    fprintf(stderr,  
+63.            "unable to set hw parameters: %s\n",  
+64.            snd_strerror(rc));  
+65.    exit(1);  
+66.}  
+67.  
+68./* Display information about the PCM interface */  
+69.  
+70.printf("PCM handle name = '%s'\n",  
+71.         snd_pcm_name(handle));  
+72.  
+73.printf("PCM state = %s\n",  
+74.         snd_pcm_state_name(snd_pcm_state(handle)));  
+75.  
+76.snd_pcm_hw_params_get_access(params,  
+77.                          (snd_pcm_access_t *) &val);  
+78.printf("access type = %s\n",  
+79.         snd_pcm_access_name((snd_pcm_access_t)val));  
+80.  
+81.snd_pcm_hw_params_get_format(params, &val);  
+82.printf("format = '%s' (%s)\n",  
+83.    snd_pcm_format_name((snd_pcm_format_t)val),  
+84.    snd_pcm_format_description(  
+85.                             (snd_pcm_format_t)val));  
+86.  
+87.snd_pcm_hw_params_get_subformat(params,  
+88.                        (snd_pcm_subformat_t *)&val);  
+89.printf("subformat = '%s' (%s)\n",  
+90.    snd_pcm_subformat_name((snd_pcm_subformat_t)val),  
+91.    snd_pcm_subformat_description(  
+92.                          (snd_pcm_subformat_t)val));  
+93.  
+94.snd_pcm_hw_params_get_channels(params, &val);  
+95.printf("channels = %d\n", val);  
+96.  
+97.snd_pcm_hw_params_get_rate(params, &val, &dir);  
+98.printf("rate = %d bps\n", val);  
+99.  
+100.snd_pcm_hw_params_get_period_time(params,  
+101.                                    &val, &dir);  
+102.printf("period time = %d us\n", val);  
+103.  
+104.snd_pcm_hw_params_get_period_size(params,  
+105.                                    &frames, &dir);  
+106.printf("period size = %d frames\n", (int)frames);  
+107.  
+108.snd_pcm_hw_params_get_buffer_time(params,  
+109.                                    &val, &dir);  
+110.printf("buffer time = %d us\n", val);  
+111.  
+112.snd_pcm_hw_params_get_buffer_size(params,  
+113.                         (snd_pcm_uframes_t *) &val);  
+114.printf("buffer size = %d frames\n", val);  
+115.  
+116.snd_pcm_hw_params_get_periods(params, &val, &dir);  
+117.printf("periods per buffer = %d frames\n", val);  
+118.  
+119.snd_pcm_hw_params_get_rate_numden(params,  
+120.                                    &val, &val2);  
+121.printf("exact rate = %d/%d bps\n", val, val2);  
+122.  
+123.val = snd_pcm_hw_params_get_sbits(params);  
+124.printf("significant bits = %d\n", val);  
+125.  
+126.snd_pcm_hw_params_get_tick_time(params,  
+127.                                  &val, &dir);  
+128.printf("tick time = %d us\n", val);  
+129.  
+130.val = snd_pcm_hw_params_is_batch(params);  
+131.printf("is batch = %d\n", val);  
+132.  
+133.val = snd_pcm_hw_params_is_block_transfer(params);  
+134.printf("is block transfer = %d\n", val);  
+135.  
+136.val = snd_pcm_hw_params_is_double(params);  
+137.printf("is double = %d\n", val);  
+138.  
+139.val = snd_pcm_hw_params_is_half_duplex(params);  
+140.printf("is half duplex = %d\n", val);  
+141.  
+142.val = snd_pcm_hw_params_is_joint_duplex(params);  
+143.printf("is joint duplex = %d\n", val);  
+144.  
+145.val = snd_pcm_hw_params_can_overrange(params);  
+146.printf("can overrange = %d\n", val);  
+147.  
+148.val = snd_pcm_hw_params_can_mmap_sample_resolution(params);  
+149.printf("can mmap = %d\n", val);  
+150.  
+151.val = snd_pcm_hw_params_can_pause(params);  
+152.printf("can pause = %d\n", val);  
+153.  
+154.val = snd_pcm_hw_params_can_resume(params);  
+155.printf("can resume = %d\n", val);  
+156.  
+157.val = snd_pcm_hw_params_can_sync_start(params);  
+158.printf("can sync start = %d\n", val);  
+159.  
+160.snd_pcm_close(handle);  
+161.  
+162.return 0;  
+163.}  
+
+
+
+
+打开默认的PCM设备，设置一些硬件参数并且打印出最常用的硬件参数值。它并不做任何回放或录音的操作。
+
+1）snd_pcm_open打开默认的PCM 设备并设置访问模式为PLAYBACK。这个函数返回一个句柄，这个句柄保存在第一个函数参数中。该句柄会在随后的函数中用到。像其它函数一样，这个函数返回一个整数。
+
+int snd_pcm_open(snd_pcm_t **pcmp, const char *name, snd_pcm_stream_t stream, int mode)
+
+
+2）如果返回值小于0,则代码函数调用出错。如果出错，我们用snd_errstr打开错误信息并退出。
+
+fprintf(stderr,"unable to open pcm device: %s\n",snd_strerror(rc)); // int rc ;
+
+
+3）为了设置音频流的硬件参数，我们需要分配一个类型为snd_pcm_hw_param的变量。分配用到函数宏 snd_pcm_hw_params_alloca。
+
+snd_pcm_hw_params_alloca(&params); //snd_pcm_uframes_t frames;
+
+
+4）下一步，我们使用函数snd_pcm_hw_params_any来初始化这个变量，传递先前打开的 PCM流句柄。
+
+snd_pcm_hw_params_any(handle, params);
+
+5）接下来，我们调用API来设置我们所需的硬件参数。这些函数需要三个参数：PCM流句柄，参数类型，参数值。我们设置流为交错模式，16位的样本大小，2 个信道，44100bps的采样率。对于采样率而言，声音硬件并不一定就精确地支持我们所定的采样率，但是我们可以使用函数 snd_pcm_hw_params_set_rate_near来设置最接近我们指定的采样率的采样率。其实只有当我们调用函数 snd_pcm_hw_params后，硬件参数才会起作用。
+6）程序的剩余部分获得并打印一些PCM流参数，包括周期和缓冲区大小。结果可能会因为声音硬件的不同而不同。
+ 运行该程序后，做实验，改动一些代码。把设备名字改成hw：0,0,然后看结果是否会有变化。设置不同的硬件参数然后观察结果的变化。 
+Listing 3. Simple Sound Playback
+
+
+
+
+
+[html]  view plaincopyprint?
+01./* 
+02.
+03.This example reads standard from input and writes 
+04.to the default PCM device for 5 seconds of data. 
+05.
+06.*/ 
+07.
+08./* Use the newer ALSA API */ 
+09.#define ALSA_PCM_NEW_HW_PARAMS_API 
+10.
+11.#include <alsa/asoundlib.h> 
+12.
+13.int main() 
+14.{ 
+15.long loops; 
+16.int rc; 
+17.int size; 
+18.snd_pcm_t *handle; 
+19.snd_pcm_hw_params_t *params; 
+20.unsigned int val; 
+21.int dir; 
+22.snd_pcm_uframes_t frames; 
+23.char *buffer; 
+24.
+25./* Open PCM device for playback. */ 
+26.rc = snd_pcm_open(&handle, "default", 
+27.SND_PCM_STREAM_PLAYBACK, 0); 
+28.if (rc < 0) 
+29.{ 
+30.fprintf(stderr,"unable to open pcm device: %s\n",snd_strerror(rc));  
+31.exit(1); 
+32.} 
+33.
+34./* Allocate a hardware parameters object. */ 
+35.snd_pcm_hw_params_alloca(?ms); 
+36.
+37./* Fill it in with default values. */ 
+38.snd_pcm_hw_params_any(handle, params); 
+39.
+40./* Set the desired hardware parameters. */ 
+41.
+42./* Interleaved mode */ 
+43.snd_pcm_hw_params_set_access(handle, params, 
+44.SND_PCM_ACCESS_RW_INTERLEAVED); 
+45.
+46./* Signed 16-bit little-endian format */ 
+47.snd_pcm_hw_params_set_format(handle, params, 
+48.SND_PCM_FORMAT_S16_LE); 
+49.
+50./* Two channels (stereo) */ 
+51.snd_pcm_hw_params_set_channels(handle, params, 2); 
+52.
+53./* 44100 bits/second sampling rate (CD quality) */ 
+54.val = 44100; 
+55.snd_pcm_hw_params_set_rate_near(handle, params, 
+56.&val, &dir); 
+57.
+58./* Set period size to 32 frames. */ 
+59.frames =  32; 
+60.snd_pcm_hw_params_set_period_size_near(handle, 
+61.params, &frames, &dir); 
+62.
+63./* Write the parameters to the driver */ 
+64.rc = snd_pcm_hw_params(handle, params); 
+65.if (rc < 0) { 
+66.fprintf(stderr, 
+67."unable to set hw parameters: %s\n", 
+68.snd_strerror(rc)); 
+69.exit(1); 
+70.} 
+71.
+72./* Use a buffer large enough to hold one period */ 
+73.snd_pcm_hw_params_get_period_size(params, &frames, 
+74.&dir); 
+75.size = frames * 4; /* 2 bytes/sample, 2 channels */ 
+76.buffer = (char *) malloc(size); 
+77.
+78./* We want to loop for 5 seconds */ 
+79.snd_pcm_hw_params_get_period_time(params,&val, &dir);  
+80./* 5 seconds in microseconds divided by 
+81.* period time */ 
+82.loops = 5000000 / val; 
+83.
+84.while (loops > 0) //循环录音 5 s  
+85.{ 
+86.loops--; 
+87.rc = read(0, buffer, size); 
+88.if (rc == 0) //没有读取到数据  
+89.{ 
+90.fprintf(stderr, "end of file on input\n"); 
+91.break; 
+92.} 
+93.else if (rc != size)//实际读取 的数据 小于 要读取的数据 
+94.{ 
+95.fprintf(stderr,"short read: read %d bytes\n", rc); 
+96.} 
+97.
+98.rc = snd_pcm_writei(handle, buffer, frames);//写入声卡 （放音） 
+99.if (rc == -EPIPE) 
+100.{ 
+101./* EPIPE means underrun */ 
+102.fprintf(stderr, "underrun occurred\n"); 
+103.snd_pcm_prepare(handle); 
+104.} else if (rc < 0) { 
+105.fprintf(stderr,"error from writei: %s\n",snd_strerror(rc)); 
+106.} else if (rc != (int)frames) { 
+107.fprintf(stderr,"short write, write %d frames\n", rc);  
+108.} 
+109.} 
+110.
+111.snd_pcm_drain(handle); 
+112.snd_pcm_close(handle); 
+113.free(buffer); 
+114.
+115.return 0; 
+116.} 
+
+
+
+[html] view plaincopyprint?在CODE上查看代码片派生到我的代码片
+01./*  
+02.  
+03.This example reads standard from input and writes  
+04.to the default PCM device for 5 seconds of data.  
+05.  
+06.*/  
+07.  
+08./* Use the newer ALSA API */  
+09.#define ALSA_PCM_NEW_HW_PARAMS_API  
+10.  
+11.#include <alsa/asoundlib.h>  
+12.  
+13.int main()   
+14.{  
+15.  long loops;  
+16.  int rc;  
+17.  int size;  
+18.  snd_pcm_t *handle;  
+19.  snd_pcm_hw_params_t *params;  
+20.  unsigned int val;  
+21.  int dir;  
+22.  snd_pcm_uframes_t frames;  
+23.  char *buffer;  
+24.  
+25.  /* Open PCM device for playback. */  
+26.  rc = snd_pcm_open(&handle, "default",  
+27.                    SND_PCM_STREAM_PLAYBACK, 0);  
+28.  if (rc < 0)  
+29.  {  
+30.    fprintf(stderr,"unable to open pcm device: %s\n",snd_strerror(rc));  
+31.    exit(1);  
+32.  }  
+33.  
+34.  /* Allocate a hardware parameters object. */  
+35.  snd_pcm_hw_params_alloca(?ms);  
+36.  
+37.  /* Fill it in with default values. */  
+38.  snd_pcm_hw_params_any(handle, params);  
+39.  
+40.  /* Set the desired hardware parameters. */  
+41.  
+42.  /* Interleaved mode */  
+43.  snd_pcm_hw_params_set_access(handle, params,  
+44.                      SND_PCM_ACCESS_RW_INTERLEAVED);  
+45.  
+46.  /* Signed 16-bit little-endian format */  
+47.  snd_pcm_hw_params_set_format(handle, params,  
+48.                              SND_PCM_FORMAT_S16_LE);  
+49.  
+50.  /* Two channels (stereo) */  
+51.  snd_pcm_hw_params_set_channels(handle, params, 2);  
+52.  
+53.  /* 44100 bits/second sampling rate (CD quality) */  
+54.  val = 44100;  
+55.  snd_pcm_hw_params_set_rate_near(handle, params,  
+56.                                  &val, &dir);  
+57.  
+58.  /* Set period size to 32 frames. */  
+59.  frames = 32;  
+60.  snd_pcm_hw_params_set_period_size_near(handle,  
+61.                              params, &frames, &dir);  
+62.  
+63.  /* Write the parameters to the driver */  
+64.  rc = snd_pcm_hw_params(handle, params);  
+65.  if (rc < 0) {  
+66.    fprintf(stderr,  
+67.            "unable to set hw parameters: %s\n",  
+68.            snd_strerror(rc));  
+69.    exit(1);  
+70.  }  
+71.  
+72.  /* Use a buffer large enough to hold one period */  
+73.  snd_pcm_hw_params_get_period_size(params, &frames,  
+74.                                    &dir);  
+75.  size = frames * 4; /* 2 bytes/sample, 2 channels */  
+76.  buffer = (char *) malloc(size);  
+77.  
+78.  /* We want to loop for 5 seconds */  
+79.  snd_pcm_hw_params_get_period_time(params,&val, &dir);  
+80.  /* 5 seconds in microseconds divided by  
+81.   * period time */  
+82.  loops = 5000000 / val;  
+83.  
+84.  while (loops > 0) //循环录音 5 s    
+85.  {  
+86.    loops--;  
+87.    rc = read(0, buffer, size);  
+88.    if (rc == 0) //没有读取到数据   
+89.    {  
+90.      fprintf(stderr, "end of file on input\n");  
+91.      break;  
+92.    }   
+93.    else if (rc != size)//实际读取 的数据 小于 要读取的数据   
+94.    {  
+95.      fprintf(stderr,"short read: read %d bytes\n", rc);  
+96.    }  
+97.      
+98.    rc = snd_pcm_writei(handle, buffer, frames);//写入声卡  （放音）   
+99.    if (rc == -EPIPE)   
+100.    {  
+101.      /* EPIPE means underrun */  
+102.      fprintf(stderr, "underrun occurred\n");  
+103.      snd_pcm_prepare(handle);  
+104.    } else if (rc < 0) {  
+105.      fprintf(stderr,"error from writei: %s\n",snd_strerror(rc));  
+106.    }  else if (rc != (int)frames) {  
+107.      fprintf(stderr,"short write, write %d frames\n", rc);  
+108.    }  
+109.  }  
+110.  
+111.  snd_pcm_drain(handle);  
+112.  snd_pcm_close(handle);  
+113.  free(buffer);  
+114.  
+115.  return 0;  
+116.}  
+
+
+
+
+
+
+
+清单3扩展了之前的示例。向声卡中写入了一些声音样本以实现声音回放。在这个例子中，我们从标准输入中读取数据，每个周期读取足够多的数据，然后将它们写入到声卡中，直到5秒钟的数据全部传输完毕。
+ 这个程序的开始处和之前的版本一样---打开PCM设备、设置硬件参数。我们使用由ALSA自己选择的周期大小，申请该大小的缓冲区来存储样本。然后我们找出周期时间，这样我们就能计算出本程序为了能够播放5秒钟，需要多少个周期。
+ 在处理数据的循环中，我们从标准输入中读入数据，并往缓冲区中填充一个周期的样本。然后检查并处理错误，这些错误可能是由到达文件结尾，或读取的数据长度与我期望的数据长度不一致导致的。
+ 我们调用snd_pcm_writei来发送数据。它操作起来很像内核的写系统调用，只是这里的大小参数是以帧来计算的。我们检查其返回代码值。返回值为EPIPE表明发生了underrun，使得PCM音频流进入到XRUN状态并停止处理数据。从该状态中恢复过来的标准方法是调用snd_pcm_prepare函数，把PCM流置于PREPARED状态，这样下次我们向该PCM流中数据时，它就能重新开始处理数据。如果我们得到的错误码不是EPIPE，我们把错误码打印出来，然后继续。最后，如果写入的帧数不是我们期望的，则打印出错误消息。 这个程序一直循环，直到5秒钟的帧全部传输完，或者输入流读到文件结尾。然后我们调用snd_pcm_drain把所有挂起没有传输完的声音样本传输完全，最后关闭该音频流，释放之前动态分配的缓冲区，退出。 我们可以看到这个程序没有什么用，除非标准输入被重定向到了其它其它的文件。尝试用设备/dev/urandom来运行这个程序，该设备产生随机数据： ./example3 </dev/urandom 随机数据会产生5秒钟的白色噪声。 然后，尝试把标准输入重定向到设备/dev/null和/dev/zero上，并比较结果。改变一些参数，例如采样率和数据格式，然后查看结果的变化。
+Listing 4. Simple Sound Recording
+
+
+
+
+
+[html]  view plaincopyprint?
+01./* 
+02.
+03.This example reads from the default PCM device 
+04.and writes to standard output for 5 seconds of data. 
+05.
+06.*/ 
+07.
+08./* Use the newer ALSA API */ 
+09.#define ALSA_PCM_NEW_HW_PARAMS_API 
+10.
+11.#include <alsa/asoundlib.h> 
+12.
+13.int main() { 
+14.long loops; 
+15.int rc; 
+16.int size; 
+17.snd_pcm_t *handle; 
+18.snd_pcm_hw_params_t *params; 
+19.unsigned int val; 
+20.int dir; 
+21.snd_pcm_uframes_t frames; 
+22.char *buffer; 
+23.
+24./* Open PCM device for recording (capture). */ 
+25.rc = snd_pcm_open(&handle, "default", 
+26.SND_PCM_STREAM_CAPTURE, 0); 
+27.if (rc < 0) { 
+28.fprintf(stderr, 
+29."unable to open pcm device: %s\n", 
+30.snd_strerror(rc)); 
+31.exit(1); 
+32.} 
+33.
+34./* Allocate a hardware parameters object. */ 
+35.snd_pcm_hw_params_alloca(?ms); 
+36.
+37./* Fill it in with default values. */ 
+38.snd_pcm_hw_params_any(handle, params); 
+39.
+40./* Set the desired hardware parameters. */ 
+41.
+42./* Interleaved mode */ 
+43.snd_pcm_hw_params_set_access(handle, params, 
+44.SND_PCM_ACCESS_RW_INTERLEAVED); 
+45.
+46./* Signed 16-bit little-endian format */ 
+47.snd_pcm_hw_params_set_format(handle, params, 
+48.SND_PCM_FORMAT_S16_LE); 
+49.
+50./* Two channels (stereo) */ 
+51.snd_pcm_hw_params_set_channels(handle, params, 2); 
+52.
+53./* 44100 bits/second sampling rate (CD quality) */ 
+54.val = 44100; 
+55.snd_pcm_hw_params_set_rate_near(handle, params, 
+56.&val, &dir); 
+57.
+58./* Set period size to 32 frames. */ 
+59.frames =  32; 
+60.snd_pcm_hw_params_set_period_size_near(handle, 
+61.params, &frames, &dir); 
+62.
+63./* Write the parameters to the driver */ 
+64.rc = snd_pcm_hw_params(handle, params); 
+65.if (rc < 0) { 
+66.fprintf(stderr, 
+67."unable to set hw parameters: %s\n", 
+68.snd_strerror(rc)); 
+69.exit(1); 
+70.} 
+71.
+72./* Use a buffer large enough to hold one period */ 
+73.snd_pcm_hw_params_get_period_size(params, 
+74.&frames, &dir); 
+75.size = frames * 4; /* 2 bytes/sample, 2 channels */ 
+76.buffer = (char *) malloc(size); 
+77.
+78./* We want to loop for 5 seconds */ 
+79.snd_pcm_hw_params_get_period_time(params, 
+80.&val, &dir); 
+81.loops =  5000000 / val; 
+82.
+83.while (loops > 0) {  
+84.loops--; 
+85.rc = snd_pcm_readi(handle, buffer, frames); 
+86.if (rc == -EPIPE) {  
+87./* EPIPE means overrun */ 
+88.fprintf(stderr, "overrun occurred\n"); 
+89.snd_pcm_prepare(handle); 
+90.} else if (rc < 0) { 
+91.fprintf(stderr, 
+92."error from read: %s\n", 
+93.snd_strerror(rc)); 
+94.} else if (rc != (int)frames) { 
+95.fprintf(stderr, "short read, read %d frames\n", rc);  
+96.} 
+97.rc = write(1, buffer, size); 
+98.if (rc != size) 
+99.fprintf(stderr, 
+100."short write: wrote %d bytes\n", rc); 
+101.} 
+102.
+103.snd_pcm_drain(handle); 
+104.snd_pcm_close(handle); 
+105.free(buffer); 
+106.
+107.return 0; 
+108.} 
+
+
+
+[html] view plaincopyprint?在CODE上查看代码片派生到我的代码片
+01./*  
+02.  
+03.This example reads from the default PCM device  
+04.and writes to standard output for 5 seconds of data.  
+05.  
+06.*/  
+07.  
+08./* Use the newer ALSA API */  
+09.#define ALSA_PCM_NEW_HW_PARAMS_API  
+10.  
+11.#include <alsa/asoundlib.h>  
+12.  
+13.int main() {  
+14.long loops;  
+15.int rc;  
+16.int size;  
+17.snd_pcm_t *handle;  
+18.snd_pcm_hw_params_t *params;  
+19.unsigned int val;  
+20.int dir;  
+21.snd_pcm_uframes_t frames;  
+22.char *buffer;  
+23.  
+24./* Open PCM device for recording (capture). */  
+25.rc = snd_pcm_open(&handle, "default",  
+26.                    SND_PCM_STREAM_CAPTURE, 0);  
+27.if (rc < 0) {  
+28.    fprintf(stderr,  
+29.            "unable to open pcm device: %s\n",  
+30.            snd_strerror(rc));  
+31.    exit(1);  
+32.}  
+33.  
+34./* Allocate a hardware parameters object. */  
+35.snd_pcm_hw_params_alloca(?ms);  
+36.  
+37./* Fill it in with default values. */  
+38.snd_pcm_hw_params_any(handle, params);  
+39.  
+40./* Set the desired hardware parameters. */  
+41.  
+42./* Interleaved mode */  
+43.snd_pcm_hw_params_set_access(handle, params,  
+44.                      SND_PCM_ACCESS_RW_INTERLEAVED);  
+45.  
+46./* Signed 16-bit little-endian format */  
+47.snd_pcm_hw_params_set_format(handle, params,  
+48.                              SND_PCM_FORMAT_S16_LE);  
+49.  
+50./* Two channels (stereo) */  
+51.snd_pcm_hw_params_set_channels(handle, params, 2);  
+52.  
+53./* 44100 bits/second sampling rate (CD quality) */  
+54.val = 44100;  
+55.snd_pcm_hw_params_set_rate_near(handle, params,  
+56.                                  &val, &dir);  
+57.  
+58./* Set period size to 32 frames. */  
+59.frames = 32;  
+60.snd_pcm_hw_params_set_period_size_near(handle,  
+61.                              params, &frames, &dir);  
+62.  
+63./* Write the parameters to the driver */  
+64.rc = snd_pcm_hw_params(handle, params);  
+65.if (rc < 0) {  
+66.    fprintf(stderr,  
+67.            "unable to set hw parameters: %s\n",  
+68.            snd_strerror(rc));  
+69.    exit(1);  
+70.}  
+71.  
+72./* Use a buffer large enough to hold one period */  
+73.snd_pcm_hw_params_get_period_size(params,  
+74.                                      &frames, &dir);  
+75.size = frames * 4; /* 2 bytes/sample, 2 channels */  
+76.buffer = (char *) malloc(size);  
+77.  
+78./* We want to loop for 5 seconds */  
+79.snd_pcm_hw_params_get_period_time(params,  
+80.                                         &val, &dir);  
+81.loops = 5000000 / val;  
+82.  
+83.while (loops > 0) {  
+84.    loops--;  
+85.    rc = snd_pcm_readi(handle, buffer, frames);  
+86.    if (rc == -EPIPE) {  
+87.      /* EPIPE means overrun */  
+88.      fprintf(stderr, "overrun occurred\n");  
+89.      snd_pcm_prepare(handle);  
+90.    } else if (rc < 0) {  
+91.      fprintf(stderr,  
+92.              "error from read: %s\n",  
+93.              snd_strerror(rc));  
+94.    } else if (rc != (int)frames) {  
+95.      fprintf(stderr, "short read, read %d frames\n", rc);  
+96.    }  
+97.    rc = write(1, buffer, size);  
+98.    if (rc != size)  
+99.      fprintf(stderr,  
+100.              "short write: wrote %d bytes\n", rc);  
+101.}  
+102.  
+103.snd_pcm_drain(handle);  
+104.snd_pcm_close(handle);  
+105.free(buffer);  
+106.  
+107.return 0;  
+108.}  
+
+
+清单4类似于清单3中的程序，除了这里的程序时做声音的抓取(录音)。当打开PCM设备时我们指定打开模式为 SND_PCM_STREAM_CPATURE。在主循环中，我们调用snd_pcm_readi从声卡中读取数据，并把它们写入到标准输出。同样地，我们检查是否有overrun，如果存在，用与前例中相同的方式处理。
+ 运行清单4的程序将录制将近5秒钟的声音数据，并把它们发送到标准输出。你也可以重定向到某个文件。如果你有一个麦克风连接到你的声卡，可以使用某个混音程序(mixer)设置录音源和级别。同样地，你也可以运行一个CD播放器程序并把录音源设成CD。尝
+ 运行程序4并把输出定向到某个文件，然后运行程序 3播放该文件里的声音数据：
+./listing4 > sound.raw
+ ./listing3 < sound.raw
+如果你的声卡支持全双工，你可以通过管道把两个程序连接起来，这样就可以从声卡中听到录制的声音：
+./listing4 | ./listing3
+同样地，您可以做实验，看看采样率和样本格式的变化会产生什么影响。
+
+
+ 高级特性
+ 在前面的例子中，PCM流是以阻塞模式操作的，也就是说，直到数据已经传送完，PCM接口调用才会返回。在事件驱动的交互式程序中，这样会长时间阻塞应用程序，通常是不能接受的。ALSA支持以非阻塞模式打开音频流，这样读写函数调用后立即返回。如果数据传输被挂起，调用不能被处理，ALSA就是返回一个 EBUSY的错误码。
+ 许多图形应用程序使用回调来处理事件。ALSA支持以异步的方式打开一个PCM音频流。这使得当某个周期的样本数据被传输完后，某个已注册的回调函数将会调用。
+ 这里用到的snd_pcm_readi和snd_pcm_writei调用和Linux下的读写系统调用类似。字母i表示处理的帧是交错式 (interleaved)的。ALSA中存在非交互模式的对应的函数。Linux下的许多设备也支持mmap系统调用，这个调用将设备内存映射到主内存，这样数据就可以用指针来维护。ALSA也运行以mmap模式打开一个PCM信道，这允许有效的零拷贝(zero copy)方式访问声音数据。
+
+
+ 总结
+ 我希望这篇文章能够激励你尝试编写某些ALSA程序。伴随着2.6内核在Linux发布版本(distributions)中被广泛地使用，ALSA也将被广泛地采用。它的高级特征将帮助Linux音频程序更好地向前发展。
+ 

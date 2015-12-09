@@ -1,0 +1,1874 @@
+http://zgmgypb.blog.163.com/blog/static/96202819201312764755728/
+http://blog.csdn.net/leichelle/article/details/7417367
+http://www.linuxidc.com/Linux/2010-10/29457.htm
+
+ Linux下LCD编程   .
+
+
+标签： linux编程structbufferfile终端  
+
+2012-03-31 22:22 4780人阅读 评论(0) 收藏 举报 
+.
+
+ 分类： 
+
+
+ARM+Linux移植（22）   
+
+
+. 
+
+
+目录(?)[+]
+
+
+
+
+
+Linux下的帧缓冲lcd应用编程 (2009-12-16 22:25)一键转载
+
+分类： xserver
+
+
+
+
+ 
+原文地址：http://www.dzkf.cn/html/qianrushixitong/2007/0516/2090.html
+
+
+
+
+一、Linux的帧缓冲设备
+
+帧缓冲（framebuffer）是 Linux 为显示设备提供的一个接口，把显存抽象后的一种设备，他允许上层应用程序在图形模式下直接对显示缓冲区进行读写操作。这种操作是抽象的，统一的。用户不必关心物理显存的位置、换页机制等等具体细节。这些都是由Framebuffer 设备驱动来完成的。帧缓冲驱动的应用广泛，在 linux 的桌面系统中，Xwindow 服务器就是利用帧缓冲进行窗口的绘制。尤其是通过帧缓冲可显示汉字点阵，成为 Linux汉化的唯一可行方案。
+
+帧缓冲设备对应的设备文件为/dev/fb*，如果系统有多个显示卡，Linux 下还可支持多个帧缓冲设备，最多可达 32 个，分别为/dev/fb0 到/dev/fb31，而/dev/fb 则为当前缺省的帧缓冲设备，通常指向/dev/fb0。当然在嵌入式系统中支持一个显示设备就够了。帧缓冲设备为标准字符设备，主设备号为29，次设备号则从0到31。分别对应/dev/fb0-/dev/fb31。
+
+通过/dev/fb，应用程序的操作主要有这几种：
+
+1．读/写（read/write）/dev/fb：相当于读/写屏幕缓冲区。例如用  cp /dev/fb0 tmp 命令可将当前屏幕的内容拷贝到一个文件中，而命令 cp tmp > /dev/fb0 则将图形文件tmp显示在屏幕上。
+
+2．映射（map）操作：由于 Linux 工作在保护模式，每个应用程序都有自己的虚拟地址空间，在应用程序中是不能直接访问物理缓冲区地址的。为此，Linux 在文件操作 file_operations 结构中提供了 mmap 函数，可将文件的内容映射到用户空间。对于帧缓冲设备，则可通过映射操作，可将屏幕缓冲区的物理地址映射到用户空间的一段虚拟地址中，之后用户就可以通过读写这段虚拟地址访问屏幕缓冲区，在屏幕上绘图了。
+
+3．I/O控制：对于帧缓冲设备，对设备文件的 ioctl操作可读取/设置显示设备及屏幕的参数，如分辨率，显示颜色数，屏幕大小等等。ioctl 的操作是由底层的驱动程序来完成的。
+
+在应用程序中，操作/dev/fb的一般步骤如下：
+
+1．打开/dev/fb设备文件。
+
+2．用 ioctl 操作取得当前显示屏幕的参数，如屏幕分辨率，每个像素点的比特数。根据屏幕参数可计算屏幕缓冲区的大小。
+
+3．将屏幕缓冲区映射到用户空间（mmap）。
+
+4．映射后就可以直接读写屏幕缓冲区，进行绘图和图片显示了。
+
+ 典型程序段如下：
+
+#include <linux/fb.h>
+
+int main()
+
+{  
+
+ int fbfd = 0;
+
+ struct fb_var_screeninfo vinfo;
+
+ struct fb_fix_screeninfo finfo;
+
+ long int screensize = 0;
+
+/*打开设备文件*/
+
+ fbfd = open("/dev/fb0", O_RDWR);
+
+/*取得屏幕相关参数*/
+
+ ioctl(fbfd, FBIOGET_FSCREENINFO, &finfo);  
+
+ ioctl(fbfd, FBIOGET_VSCREENINFO, &vinfo);
+
+/*计算屏幕缓冲区大小*/
+
+ screensize = vinfo.xres * vinfo.yres * vinfo.bits_per_pixel / 8;
+
+/*映射屏幕缓冲区到用户地址空间*/
+
+fbp=(char*)mmap(0,screensize,PROT_READ | PROT_WRITE,MAP_SHARED, fbfd, 0);
+
+/*下面可通过 fbp指针读写缓冲区*/
+
+……
+
+/*释放缓冲区，关闭设备*/
+
+munmap(fbp, screensize);
+
+close(fbfd);
+
+}
+
+二、ioctl操作
+
+ioctl(fbfd, FBIOGET_VSCREENINFO, &finfo)
+
+获取fb_var_screeninfo结构的信息，在linux/include/linux/fb.h定义。
+
+ioctl(fbfd, FBIOGET_FSCREENINFO, &vinfo)
+
+获取fb_fix_screeninfon结构的信息。在linux/include/linux/fb.h定义。
+
+fbfd为设备文件号。
+
+三．mmap函数
+
+功能描述：
+
+mmap函数是unix/linux下的系统调用
+
+mmap将一个文件或者其它对象映射进内存。文件被映射到多个页上，如果文件的大小不是所有页的大小之和，最后一个页不被使用的空间将会清零。munmap执行相反的操作，删除特定地址区域的对象映射。
+
+基于文件的映射，在mmap和munmap执行过程的任何时刻，被映射文件的st_atime可能被更新。如果st_atime字段在前述的情况下没有得到更新，首次对映射区的第一个页索引时会更新该字段的值。用PROT_WRITE 和 MAP_SHARED标志建立起来的文件映射，其st_ctime 和 st_mtime
+
+在对映射区写入之后，但在msync()通过MS_SYNC 和 MS_ASYNC两个标志调用之前会被更新。
+
+用法：
+
+#include <sys/mman.h>
+
+void *mmap(void *start, size_t length, int prot, int flags,
+
+int fd, off_t offset);
+
+int munmap(void *start, size_t length);
+
+参数：
+
+start：映射区的开始地址。
+
+length：映射区的长度。
+
+prot：期望的内存保护标志，不能与文件的打开模式冲突。是以下的某个值，可以通过or运算合理地组合在一起
+
+PROT_EXEC //页内容可以被执行
+
+PROT_READ //页内容可以被读取
+
+PROT_WRITE //页可以被写入
+
+PROT_NONE //页不可访问
+
+flags：指定映射对象的类型，映射选项和映射页是否可以共享。它的值可以是一个或者多个以下位的组合体
+
+MAP_FIXED //使用指定的映射起始地址，如果由start和len参数指定的内存区重叠于现存的映射空间，重叠部分将会被丢弃。如果指定的起始地址不可用，操作将会失败。并且起始地址必须落在页的边界上。
+
+MAP_SHARED //与其它所有映射这个对象的进程共享映射空间。对共享区的写入，相当于输出到文件。直到msync()或者munmap()被调用，文件实际上不会被更新。
+
+MAP_PRIVATE //建立一个写入时拷贝的私有映射。内存区域的写入不会影响到原文件。这个标志和以上标志是互斥的，只能使用其中一个。
+
+MAP_DENYWRITE //这个标志被忽略。
+
+MAP_EXECUTABLE //同上
+
+MAP_NORESERVE //不要为这个映射保留交换空间。当交换空间被保留，对映射区修改的可能会得到保证。当交换空间不被保留，同时内存不足，对映射区的修改会引起段违例信号。
+
+MAP_LOCKED //锁定映射区的页面，从而防止页面被交换出内存。
+
+MAP_GROWSDOWN //用于堆栈，告诉内核VM系统，映射区可以向下扩展。
+
+MAP_ANONYMOUS //匿名映射，映射区不与任何文件关联。
+
+MAP_ANON //MAP_ANONYMOUS的别称，不再被使用。
+
+MAP_FILE //兼容标志，被忽略。
+
+MAP_32BIT //将映射区放在进程地址空间的低2GB，MAP_FIXED指定时会被忽略。当前这个标志只在x86-64平台上得到支持。
+
+MAP_POPULATE //为文件映射通过预读的方式准备好页表。随后对映射区的访问不会被页违例阻塞。
+
+MAP_NONBLOCK //仅和MAP_POPULATE一起使用时才有意义。不执行预读，只为已存在于内存中的页面建立页表入口。
+
+fd：有效的文件描述词。如果MAP_ANONYMOUS被设定，为了兼容问题，其值应为-1。
+
+offset：被映射对象内容的起点。
+
+返回说明：
+
+成功执行时，mmap()返回被映射区的指针，munmap()返回0。失败时，mmap()返回MAP_FAILED[其值为(void *)-1]，munmap返回-1。errno被设为以下的某个值
+
+EACCES：访问出错
+
+EAGAIN：文件已被锁定，或者太多的内存已被锁定
+
+EBADF：fd不是有效的文件描述词
+
+EINVAL：一个或者多个参数无效
+
+ENFILE：已达到系统对打开文件的限制
+
+ENODEV：指定文件所在的文件系统不支持内存映射
+
+ENOMEM：内存不足，或者进程已超出最大内存映射数量
+
+EPERM：权能不足，操作不允许
+
+ETXTBSY：已写的方式打开文件，同时指定MAP_DENYWRITE标志
+
+SIGSEGV：试着向只读区写入
+
+SIGBUS：试着访问不属于进程的内存区
+ 
+四、编程实例：
+
+内核：linux-2.6.29.1
+
+目标板：友善之臂mini2440
+
+arm-linux-gcc-4.3.2
+ rar 
+ 
+
+
+
+系统分类: 软件开发 
+用户分类: 嵌入式linux的LCD驱动 
+标签: linux lcd 
+来源: 原创 
+
+发表评论 阅读全文(322) | 回复(0)
+
+
+
+
+2
+关于投票
+
+Framebuffer驱动程序模型
+
+发表于 2009/8/22 22:03:01
+
+
+Framebuffer驱动程序模型
+ 下图会向你展示目前的framebuffer设备驱动的结构，最常用的是非标准驱动。很明显他所处的层次最高，程序编写是最容易的。理解了这个图的，你已经很轻松的去完成一个fb驱动，比如给sa1100,s2410,s2440系列的ARM的LCD控制器写驱动。
+
+
+Color Map 剖析
+在framebuffer驱动程序设计中，cmap这个东东太晕了。现在我要把他赤裸裸的剖析给大家：）
+1． struct fb_cmap
+
+
+
+
+
+/*颜色映射表*/
+struct fb_cmap {
+         __u32 start; /* First entry */
+         __u32 len; /* Number of entries */
+         __u16 *red; /* 红色 */
+         __u16 *green; /*绿色*/
+         __u16 *blue; /*蓝色*/
+         __u16 *transp; /* 透明度,允许 NULL */
+};
+ 
+
+
+该结构在fb.h文件中定义，在struct fb_ops结构中有两个成员函数与其相关：
+
+
+/*获取颜色表*/
+int (*fb_get_cmap)(struct fb_cmap *cmap, int kspc, int con, struct fb_info *info);
+ /*设定颜色表*/
+int (*fb_set_cmap)(struct fb_cmap *cmap, int kspc, int con, struct fb_info *info);
+ 
+
+
+
+在struct fb_info结构中有变量：
+
+
+struct fb_cmap cmap; /* Current cmap */
+ 
+
+
+在fpgen基础操作下提供：
+
+
+extern int
+
+fbgen_get_cmap(struct fb_cmap *cmap, int kspc, int con, struct fb_info *info);
+ extern int
+
+fbgen_set_cmap(struct fb_cmap *cmap, int kspc, int con, struct fb_info *info);
+ 
+
+
+在文件/* drivers/video/fbcmap.c */中提供更多的cmap应用
+
+
+extern int fb_alloc_cmap(struct fb_cmap *cmap, int len, int transp);
+ extern void fb_copy_cmap(struct fb_cmap *from, struct fb_cmap *to, int fsfromto);
+ extern int fb_get_cmap(struct fb_cmap *cmap, int kspc,
+ int (*getcolreg)(u_int, u_int *, u_int *, u_int *,u_int *, struct fb_info *),
+                                 struct fb_info *fb_info);
+ extern int fb_set_cmap(struct fb_cmap *cmap, int kspc,
+        int (*setcolreg)(u_int, u_int, u_int, u_int, u_int,struct fb_info *),
+        struct fb_info *fb_info);
+ extern struct fb_cmap *fb_default_cmap(int len);
+ extern void fb_invert_cmaps(void);
+ 
+
+
+2． 通过文件解析
+ 在anakinfb.c文件中，cmap如图
+
+
+ 在stifb.c
+
+
+本文介绍的设备是位于/video目录下面的anakinfb.c驱动程序。虽然我不清楚那个设备的特性，但是从对程序的分析中我们仍然知道如何编写一个frame buffer设备驱动。
+
+    本文是个标准的fb驱动。共221行，包含函数如下：
+
+1. static int anakinfb_getcolreg(u_int regno, u_int *red, u_int *green, u_int *blue, u_int *transp, struct fb_info *info) 31行
+
+2. static int anakinfb_setcolreg(u_int regno, u_int red, u_int green, u_int blue,u_int transp, struct fb_info *info) 45行
+
+3. static int anakinfb_get_fix(struct fb_fix_screeninfo *fix, int con, struct fb_info *info) 57行
+
+4. static int anakinfb_get_var(struct fb_var_screeninfo *var, int con, struct fb_info *info) 75行
+
+5. static int anakinfb_set_var(struct fb_var_screeninfo *var, int con, struct fb_info *info) 111行
+
+6. static int anakinfb_get_cmap(struct fb_cmap *cmap, int kspc, int con,     struct fb_info *info) 117行
+
+7. static int anakinfb_set_cmap(struct fb_cmap *cmap, int kspc, int con,     struct fb_info *info) 130行
+
+8. static int anakinfb_switch_con(int con, struct fb_info *info) 147行
+
+9. static int anakinfb_updatevar(int con, struct fb_info *info) 155行
+
+10.           static void anakinfb_blank(int blank, struct fb_info *info) 161行
+
+11.           int __init anakinfb_init(void) 178行
+
+函数1，2是寄存器操作用。函数3，4，5，6，7是fb_ops函数。函数8用于切换控制台。函数9用于更新变量。函数10用于闪烁屏幕。函数11用于初始化设备。
+    很奇怪，对fb设备的读写函数怎么没有！值得说明的是open,release,read,write,ioctl,mmap等函数的实现是由 fbmem.c文件实现了。也就是说所有的fb设备在给定了fb_info后，所有的操作都是一样的。在明确的fb_info前提下，fbmem.c中的函数可以工作的很好。这样大家应该感到非常轻松了吧，只要完成上述的几个设备相关的函数，frame buffer设备的驱动就写完了：） 
+     系统的结构如图： 
+
+
+Stifb驱动模型
+linux/drivers/video/stifb.c - Generic frame buffer driver for HP * workstations with STI (standard text interface) video firmware.
+这个驱动程序和前面的anakin设备完全不同，因为他不是采用标准的格式，而是根据 based on skeletonfb, which wasCreated 28 Dec 1997 by Geert Uytterhoeven也就是skeletonfb.c提供的框架完成的。
+
+共230行，包含函数如下：
+
+static int sti_encode_fix(struct fb_fix_screeninfo *fix, const void*par, struct fb_info_gen *info) 60行
+static int sti_decode_var(const struct fb_var_screeninfo *var,void*par, struct fb_info_gen *info) 71行
+static int sti_encode_var(struct fb_var_screeninfo *var, const void*par, struct fb_info_gen *info) 78行
+static void sti_get_par(void *par, struct fb_info_gen *info) 94行
+static void sti_set_par(const void *par, struct fb_info_gen *info) 99行
+static int sti_getcolreg(unsigned regno, unsigned *red, unsigned*green, unsigned *blue, unsigned *transp, struct fb_info *info) 104行
+static int sti_setcolreg(unsigned regno, unsigned red, unsigned green,unsigned blue, unsigned transp, struct fb_info *info) 111行
+static void sti_set_disp(const void *par, struct display *disp, structfb_info_gen *info) 118行
+static void sti_detect(void) 127行
+static int sti_blank(int blank_mode, const struct fb_info *info) 132行
+int __init stifb_init(void) 161行
+void stifb_cleanup(struct fb_info *info) 201行
+int __init stifb_setup(char *options) 208行
+
+
+
+系统分类: 软件开发 
+用户分类: 嵌入式linux的LCD驱动 
+标签: framebuffer 
+来源: 转贴 
+
+发表评论 阅读全文(217) | 回复(0)
+
+
+
+1
+关于投票
+linux帧缓冲(framebuffer)驱动
+
+发表于 2009/8/22 21:26:22
+
+　　一、FrameBuffer的原理
+
+
+　　FrameBuffer 是出现在 2.2.xx 内核当中的一种驱动程序接口。
+
+
+　　Linux是工作在保护模式下，所以用户态进程是无法象 DOS那样使用显卡BIOS里提供的中断调用来实现直接写屏，Linux抽象出FrameBuffer这个设备来供用户态进程实现直接写屏。 Framebuffer机制模仿显卡的功能，将显卡硬件结构抽象掉，可以通过Framebuffer的读写直接对显存进行操作。用户可以将 Framebuffer看成是显示内存的一个映像，将其映射到进程地址空间之后，就可以直接进行读写操作，而写操作可以立即反应在屏幕上。这种操作是抽象 的，统一的。用户不必关心物理显存的位置、换页机制等等具体细节。这些都是由Framebuffer设备驱动来完成的。
+
+
+　　但Framebuffer本身不具备任何运算数据的能力,就 只好比是一个暂时存放水的水池.CPU将运算后的结果放到这个水池,水池再将结果流到显示器.中间不会对数据做处理. 应用程序也可以直接读写这个水池的内容.在这种机制下，尽管Framebuffer需要真正的显卡驱动的支持，但所有显示任务都有CPU完成,因此CPU 负担很重
+
+
+　　framebuffer的设备文件一般是 /dev/fb0、/dev/fb1 等等。
+
+
+　　可以用命令: #dd if="/dev/zero" of="/dev/fb" 清空屏幕.
+
+
+　　如果显示模式是 1024x768-8 位色，用命令：$ dd if="/dev/zero" of="/dev/fb0" bs="1024" count="768" 清空屏幕；
+
+
+　　用命令: #dd if="/dev/fb" of="fbfile" 可以将fb中的内容保存下来；
+
+
+　　可以重新写回屏幕: #dd if="fbfile" of="/dev/fb"；
+
+
+　　在使用Framebuffer时，Linux是将显卡置于图形模式下的．
+
+
+　　在应用程序中，一般通过将 FrameBuffer 设备映射到进程地址空间的方式使用，比如下面的程序就打开 /dev/fb0 设备，并通过 mmap 系统调用进行地址映射，随后用 memset 将屏幕清空（这里假设显示模式是 1024x768-8 位色模式，线性内存模式）：
+
+
+　　int fb;
+
+
+　　unsigned char* fb_mem;
+
+
+　　fb = open ("/dev/fb0", O_RDWR);
+
+
+　　fb_mem = mmap (NULL, 1024*768, PROT_READ|PROT_WRITE,MAP_SHARED,fb,0);
+
+
+　　memset (fb_mem, 0, 1024*768); //这个命令应该只有在root可以执行
+
+
+　　FrameBuffer 设备还提供了若干 ioctl 命令，通过这些命令，可以获得显示设备的一些固定信息（比如显示内存大小）、与显示模式相关的可变信息（比如分辨率、象素结构、每扫描线的字节宽度），以及伪彩色模式下的调色板信息等等。
+
+
+　　通过 FrameBuffer 设备，还可以获得当前内核所支持的加速显示卡的类型（通过固定信息得到），这种类型通常是和特定显示芯片相关的。比如目前最新的内核（2.4.9）中，就 包含有对 S3、Matrox、nVidia、3Dfx 等等流行显示芯片的加速支持。在获得了加速芯片类型之后，应用程序就可以将 PCI 设备的内存I/O（memio）映射到进程的地址空间。这些 memio 一般是用来控制显示卡的寄存器，通过对这些寄存器的操作，应用程序就可以控制特定显卡的加速功能。
+
+
+　　PCI 设备可以将自己的控制寄存器映射到物理内存空间，而后，对这些控制寄存器的访问，给变成了对物理内存的访问。因此，这些寄存器又被称为"memio"。一旦被映射到物理内存，Linux 的普通进程就可以通过 mmap 将这些内存 I/O 映射到进程地址空间，这样就可以直接访问这些寄存器了。
+
+
+　　当然，因为不同的显示芯片具有不同的加速能力，对memio 的使用和定义也各自不同，这时，就需要针对加速芯片的不同类型来编写实现不同的加速功能。比如大多数芯片都提供了对矩形填充的硬件加速支持，但不同的芯片 实现方式不同，这时，就需要针对不同的芯片类型编写不同的用来完成填充矩形的函数。
+
+
+　　FrameBuffer 只是一个提供显示内存和显示芯片寄存器从物理内存映射到进程地址空间中的设备。所以，对于应用程序而言，如果希望在 FrameBuffer 之上进行图形编程，还需要自己动手完成其他许多工作。
+
+
+　　二、FrameBuffer在Linux中的实现和机制
+
+
+　　Framebuffer对应的源文件在linux/drivers/video/目录下。总的抽象设备文件为fbcon.c，在这个目录下还有与各种显卡驱动相关的源文件。 //这个文件要好好看看
+
+
+　　(一)、分析Framebuffer设备驱动
+
+
+　　需要特别提出的是在INTEL平台上，老式的VESA 1.2 卡，如CGA/EGA卡，是不能支持Framebuffer的，因为Framebuffer要求显卡支持线性帧缓冲，即CPU可以访问显缓冲中的每一位， 但是VESA 1.2 卡只能允许CPU一次访问64K的地址空间。
+
+
+　　FrameBuffer设备驱动基于如下两个文件：
+
+
+　　1) linux/include/linux/fb.h
+
+
+　　2) linux/drivers/video/fbmem.c
+
+
+　　下面分析这两个文件。
+
+
+　　1、fb.h
+
+
+　　几乎主要的结构都是在这个中文件定义的。这些结构包括：
+
+
+　　1）fb_var_screeninfo
+
+
+　　这个结构描述了显示卡的特性：
+
+
+　　NOTE:::: __u32 是表示 unsigned 不带符号的 32 bits 的数据类型，其余类推。这是 Linux 内核中所用到的数据类型，如果是开发用户空间（user-space）的程序，可以根据具体计算机平台的情况，用 unsigned long 等等来代替
+
+
+　　struct fb_var_screeninfo
+
+
+　　{
+
+
+　　__u32 xres; /* visible resolution */ //可视区域
+
+
+　　__u32 yres;
+
+
+　　__u32 xres_virtual; /* virtual resolution */ //可视区域
+
+
+　　__u32 yres_virtual;
+
+
+　　__u32 xoffset; /* offset from virtual to visible resolution */ //可视区域的偏移
+
+
+　　__u32 yoffset;
+
+
+　　__u32 bits_per_pixel; /* guess what */ //每一象素的bit数
+
+
+　　__u32 grayscale; /* != 0 Gray levels instead of colors *///等于零就成黑白
+
+
+　　struct fb_bitfield red; /* bitfield in fb mem if true color, */真彩的bit机构
+
+
+　　struct fb_bitfield green; /* else only length is significant */
+
+
+　　struct fb_bitfield blue; 
+
+
+　　struct fb_bitfield transp; /* transparency */ 透明
+
+
+　　__u32 nonstd; /* != 0 Non standard pixel format */ 不是标准格式
+
+
+　　__u32 activate; /* see FB_ACTIVATE_* */ 
+
+
+　　__u32 height; /* height of picture in mm */ 内存中的图像高度
+
+
+　　__u32 width; /* width of picture in mm */ 内存中的图像宽度
+
+
+　　__u32 accel_flags; /* acceleration flags (hints) */ 加速标志
+
+
+　　/* Timing: All values in pixclocks, except pixclock (of course) */
+
+
+　　时序-_-这些部分就是显示器的显示方法了，可以找相关的资料看看
+
+
+　　__u32 pixclock; /* pixel clock in ps (pico seconds) */
+
+
+　　__u32 left_margin; /* time from sync to picture */
+
+
+　　__u32 right_margin; /* time from picture to sync */
+
+
+　　__u32 upper_margin; /* time from sync to picture */
+
+
+　　__u32 lower_margin;
+
+
+　　__u32 hsync_len; /* length of horizontal sync */ 水平可视区域
+
+
+　　__u32 vsync_len; /* length of vertical sync */ 垂直可视区域
+
+
+　　__u32 sync; /* see FB_SYNC_* */
+
+
+　　__u32 vmode; /* see FB_VMODE_* */
+
+
+　　__u32 reserved[6]; /* Reserved for future compatibility */ 备用－以后开发
+
+
+　　};
+
+
+　　2) fb_fix_screeninfon
+
+
+　　这个结构在显卡被设定模式后创建，它描述显示卡的属性，并且系统运行时不能被修改；比如FrameBuffer内存的起始地址。它依赖于被设定的模式，当一个模式被设定后，内存信息由显示卡硬件给出，内存的位置等信息就不可以修改。
+
+
+　　struct fb_fix_screeninfo {
+
+
+　　char id[16]; /* identification string eg "TT Builtin" */ID
+
+
+　　unsigned long smem_start; /* Start of frame buffer mem */ 内存起始
+
+
+　　/* (physical address) */ 物理地址
+
+
+　　__u32 smem_len; /* Length of frame buffer mem */ 内存大小
+
+
+　　__u32 type; /* see FB_TYPE_* */ 
+
+
+　　__u32 type_aux; /* Interleave for interleaved Planes */插入区域？
+
+
+　　__u32 visual; /* see FB_VISUAL_* */
+
+
+　　__u16 xpanstep; /* zero if no hardware panning */没有硬件设备就为零
+
+
+　　__u16 ypanstep; /* zero if no hardware panning */
+
+
+　　__u16 ywrapstep; /* zero if no hardware ywrap */
+
+
+　　__u32 line_length; /* length of a line in bytes */ 一行的字节表示
+
+
+　　unsigned long mmio_start; /* Start of Memory Mapped I/O */内存映射的I/O起始
+
+
+　　/* (physical address) */ 
+
+
+　　__u32 mmio_len; /* Length of Memory Mapped I/O */ I/O的大小
+
+
+　　__u32 accel; /* Type of acceleration available */ 可用的加速类型
+
+
+　　__u16 reserved[3]; /* Reserved for future compatibility */
+
+
+　　};
+
+
+　　3) fb_cmap
+
+
+　　描述设备无关的颜色映射信息。可以通过FBIOGETCMAP 和 FBIOPUTCMAP 对应的ioctl操作设定或获取颜色映射信息.
+
+
+　　struct fb_cmap {
+
+
+　　__u32 start; /* First entry */ 第一个入口
+
+
+　　__u32 len; /* Number of entries */ 入口的数字
+
+
+　　__u16 *red; /* Red values */ 红
+
+
+　　__u16 *green;
+
+
+　　__u16 *blue;
+
+
+　　__u16 *transp; /* transparency, can be NULL */ 透明，可以为零
+
+
+　　};
+
+
+　　4) fb_info
+
+
+　　定义当显卡的当前状态；fb_info结构仅在内核中可见，在这个结构中有一个fb_ops指针， 指向驱动设备工作所需的函数集。
+
+
+　　struct fb_info {
+
+
+　　char modename[40]; /* default video mode */ 默认的视频卡类型
+
+
+　　kdev_t node;
+
+
+　　int flags;
+
+
+　　int open; /* Has this been open already ? */ 被打开过么？
+
+
+　　#define FBINFO_FLAG_MODULE 1 /* Low-level driver is a module */ 
+
+
+　　struct fb_var_screeninfo var; /* Current var */ 现在的视频信息
+
+
+　　struct fb_fix_screeninfo fix; /* Current fix */ 修正的信息
+
+
+　　struct fb_monspecs monspecs; /* Current Monitor specs */ 现在的显示器模式
+
+
+　　struct fb_cmap cmap; /* Current cmap */ 当前优先级
+
+
+　　struct fb_ops *fbops;
+
+
+　　char *screen_base; /* Virtual address */ 物理基址
+
+
+　　struct display *disp; /* initial display variable */初始化
+
+
+　　struct vc_data *display_fg; /* Console visible on this display */
+
+
+　　char fontname[40]; /* default font name */默认的字体
+
+
+　　devfs_handle_t devfs_handle; /* Devfs handle for new name */
+
+
+　　devfs_handle_t devfs_lhandle; /* Devfs handle for compat. symlink */兼容
+
+
+　　int (*changevar)(int); /* tell console var has changed */ 告诉console变量修改了
+
+
+　　int (*switch_con)(int, struct fb_info*);
+
+
+　　/* tell fb to switch consoles */ 告诉fb选择consoles
+
+
+　　int (*updatevar)(int, struct fb_info*);
+
+
+　　/* tell fb to update the vars */ 告诉fb更新变量
+
+
+　　void (*blank)(int, struct fb_info*); /* tell fb to (un)blank the screen */告诉fb使用黑白模式（或者不黑）
+
+
+　　/* arg = 0: unblank */arg＝0的时候黑白模式
+
+
+　　/* arg > 0: VESA level (arg-1) */ arg>0时候选择VESA模式
+
+
+　　void *pseudo_palette; /* Fake palette of 16 colors and
+
+
+　　the cursor's color for non
+
+
+　　palette mode */ 修正调色板
+
+
+　　/* From here on everything is device dependent */ 现在就可以使用了
+
+
+　　void *par;
+
+
+　　};
+
+
+　　5) struct fb_ops
+
+
+　　用户应用可以使用ioctl()系统调用来操作设备，这个结构就是用一支持ioctl()的这些操作的。
+
+
+　　struct fb_ops {
+
+
+　　/* open/release and usage marking */
+
+
+　　struct module *owner;
+
+
+　　int (*fb_open)(struct fb_info *info, int user);
+
+
+　　int (*fb_release)(struct fb_info *info, int user);
+
+
+　　/* get non settable parameters */
+
+
+　　int (*fb_get_fix)(struct fb_fix_screeninfo *fix, int con,
+
+
+　　struct fb_info *info);
+
+
+　　/* get settable parameters */
+
+
+　　int (*fb_get_var)(struct fb_var_screeninfo *var, int con,
+
+
+　　struct fb_info *info);
+
+
+　　/* set settable parameters */
+
+
+　　int (*fb_set_var)(struct fb_var_screeninfo *var, int con,
+
+
+　　struct fb_info *info);
+
+
+　　/* get colormap */
+
+
+　　int (*fb_get_cmap)(struct fb_cmap *cmap, int kspc, int con,
+
+
+　　struct fb_info *info);
+
+
+　　/* set colormap */
+
+
+　　int (*fb_set_cmap)(struct fb_cmap *cmap, int kspc, int con,
+
+
+　　struct fb_info *info);
+
+
+　　/* pan display (optional) */
+
+
+　　int (*fb_pan_display)(struct fb_var_screeninfo *var, int con,
+
+
+　　struct fb_info *info);
+
+
+　　/* perform fb specific ioctl (optional) */
+
+
+　　int (*fb_ioctl)(struct inode *inode, struct file *file, unsigned int cmd,
+
+
+　　unsigned long arg, int con, struct fb_info *info);
+
+
+　　/* perform fb specific mmap */
+
+
+　　int (*fb_mmap)(struct fb_info *info, struct file *file, struct vm_area_struct *vma);
+
+
+　　/* switch to/from raster image mode */
+
+
+　　int (*fb_rasterimg)(struct fb_info *info, int start);
+
+
+　　};
+
+
+　　6) structure map
+
+
+　　struct fb_info_gen | struct fb_info | fb_var_screeninfo
+
+
+　　| | fb_fix_screeninfo
+
+
+　　| | fb_cmap
+
+
+　　| | modename[40]
+
+
+　　| | fb_ops ---|--->ops on var
+
+
+　　| | ... | fb_open
+
+
+　　| | | fb_release
+
+
+　　| | | fb_ioctl
+
+
+　　| | | fb_mmap
+
+
+　　| struct fbgen_hwswitch 
+
+
+　　\-----|-> detect
+
+
+　　| encode_fix
+
+
+　　| encode_var
+
+
+　　| decode_fix
+
+
+　　| decode_var
+
+
+　　| get_var
+
+
+　　| set_var
+
+
+　　| getcolreg
+
+
+　　| setcolreg
+
+
+　　| pan_display
+
+
+　　| blank
+
+
+　　| set_disp
+
+
+　　[编排有点困难，第一行的第一条竖线和下面的第一列竖线对齐，第一行的第二条竖线和下面的第二列竖线对齐就可以了]
+
+
+　　这个结构 fbgen_hwswitch抽象了硬件的操作.虽然它不是必需的，但有时候很有用.
+
+
+　　2、 fbmem.c
+
+
+　　fbmem.c 处于Framebuffer设备驱动技术的中心位置.它为上层应用程序提供系统调用也为下一层的特定硬件驱动提供接口；那些底层硬件驱动需要用到这儿的接 口来向系统内核注册它们自己. fbmem.c 为所有支持FrameBuffer的设备驱动提供了通用的接口，避免重复工作.
+
+
+　　1) 全局变量
+
+
+　　struct fb_info *registered_fb[FB_MAX];
+
+
+　　int num_registered_fb;
+
+
+　　这两变量记录了所有fb_info 结构的实例，fb_info 结构描述显卡的当前状态，所有设备对应的fb_info 结构都保存在这个数组中，当一个FrameBuffer设备驱动向系统注册自己时，其对应的fb_info 结构就会添加到这个结构中，同时num_registered_fb 为自动加1.
+
+
+　　static struct {
+
+
+　　const char *name;
+
+
+　　int (*init)(void);
+
+
+　　int (*setup)(void);
+
+
+　　} fb_drivers[] __initdata= { ....};
+
+
+　　如果FrameBuffer设备被静态链接到内核，其对应的入口就会添加到这个表中；如果是动态加载的，即使用insmod/rmmod,就不需要关心这个表。
+
+
+　　static struct file_operations fb_ops ={
+
+
+　　owner: THIS_MODULE,
+
+
+　　read: fb_read,
+
+
+　　write: fb_write,
+
+
+　　ioctl: fb_ioctl,
+
+
+　　mmap: fb_mmap,
+
+
+　　open: fb_open,
+
+
+　　release: fb_release
+
+
+　　};
+
+
+　　这是一个提供给应用程序的接口.
+
+
+　　2）fbmem.c 实现了如下函数.
+
+
+　　register_framebuffer(struct fb_info *fb_info);
+
+
+　　unregister_framebuffer(struct fb_info *fb_info);
+
+
+　　这两个是提供给下层FrameBuffer设备驱动的接口，设备驱动通过这两函数向系统注册或注销自己。几乎底层设备驱动所要做的所有事情就是填充fb_info结构然后向系统注册或注销它。
+
+
+　　（二）一个LCD显示芯片的驱动实例
+
+
+　　以Skeleton LCD 控制器驱动为例，在LINUX中存有一个/fb/skeleton.c的skeleton的Framebuffer驱动程序，很简单，仅仅是填充了 fb_info结构，并且注册/注销自己。设备驱动是向用户程序提供系统调用接口，所以我们需要实现底层硬件操作并且定义file_operations 结构来向系统提供系统调用接口，从而实现更有效的LCD控制器驱动程序。
+
+
+　　1）在系统内存中分配显存
+
+
+　　在fbmem.c文件中可以看到, file_operations 结构中的open()和release()操作不需底层支持，但read()、write()和 mmap()操作需要函数fb_get_fix()的支持.因此需要重新实现函数fb_get_fix()。另外还需要在系统内存中分配显存空间，大多数的LCD控制器都没有自己的显存空间，被分配的地址空间的起始地址与长度将会被填充到fb_fix_screeninfo 结构的smem_start 和smem_len 的两个变量中.被分配的空间必须是物理连续的。
+
+
+　　2）实现 fb_ops 中的函数
+
+
+　　用户应用程序通过ioctl()系统调用操作硬件，fb_ops 中的函数就用于支持这些操作。（注： fb_ops结构与file_operations 结构不同，fb_ops是底层操作的抽象,而file_operations是提供给上层系统调用的接口，可以直接调用.
+
+
+　　ioctl()系统调用在文件fbmem.c中实现，通过观察可以发现ioctl()命令与fb_ops’s 中函数的关系:
+
+
+　　FBIOGET_VSCREENINFO fb_get_var
+
+
+　　FBIOPUT_VSCREENINFO fb_set_var
+
+
+　　FBIOGET_FSCREENINFO fb_get_fix
+
+
+　　FBIOPUTCMAP fb_set_cmap
+
+
+　　FBIOGETCMAP fb_get_cmap
+
+
+　　FBIOPAN_DISPLAY fb_pan_display
+
+
+　　如果我们定义了fb_XXX_XXX 方法，用户程序就可以使用FBIOXXXX宏的ioctl()操作来操作硬件。
+
+
+　　文件linux/drivers/video/fbgen.c或者linux/drivers/video 目录下的其它设备驱动是比较好的参考资料。在所有的这些函数中fb_set_var()是最重要的，它用于设定显示卡的模式和其它属性，下面是函数 fb_set_var()的执行步骤：
+
+
+　　1)检测是否必须设定模式
+
+
+　　2)设定模式
+
+
+　　3)设定颜色映射
+
+
+　　4) 根据以前的设定重新设置LCD控制器的各寄存器。
+
+
+　　第四步表明了底层操作到底放置在何处。在系统内存中分配显存后，显存的起始地址及长度将被设定到LCD控制器的各寄存器中（一般通过fb_set_var() 函数），显存中的内容将自动被LCD控制器输出到屏幕上。另一方面，用户程序通过函数mmap()将显存映射到用户进程地址空间中，然后用户进程向映射空间发送的所有数据都将会被显示到LCD显示器上。 
+
+
+　　三、FrameBuffer的应用
+
+
+　　（一）、一个使用FrameBuffer的例子
+
+
+　　FrameBuffer主要是根据VESA标准的实现的，所以只能实现最简单的功能。 
+
+
+　　由于涉及内核的问题，FrameBuffer是不允许在系统起来后修改显示模式等一系列操作。（好象很多人都想要这样干，这是不被允许的，当然如果你自己写驱动的话，是可以实现的）. 
+
+
+　　对FrameBuffer的操作，会直接影响到本机的所有控制台的输出，包括XWIN的图形界面。 
+
+
+　　在struct fb_info 中的char fontname[40]; /* default font name */默认的字体
+
+
+　　就可以实现显示的中文化－－－－难道 篮点linux就是这样搞得？？
+
+
+　　好，现在可以让我们开始实现直接写屏：
+
+
+　　1、打开一个FrameBuffer设备
+
+
+　　2、通过mmap调用把显卡的物理内存空间映射到用户空间
+
+
+　　3、直接写内存。
+
+
+　　/********************************
+
+
+　　File name : fbtools.h
+
+
+　　*/
+
+
+　　#ifndef _FBTOOLS_H_
+
+
+　　#define _FBTOOLS_H_
+
+
+　　#include <linux/fb.h>
+
+
+　　//a framebuffer device structure;
+
+
+　　typedef struct fbdev{
+
+
+　　int fb;
+
+
+　　unsigned long fb_mem_offset;
+
+
+　　unsigned long fb_mem;
+
+
+　　struct fb_fix_screeninfo fb_fix;
+
+
+　　struct fb_var_screeninfo fb_var;
+
+
+　　char dev[20];
+
+
+　　} FBDEV, *PFBDEV;
+
+
+　　//open & init a frame buffer
+
+
+　　//to use this function,
+
+
+　　//you must set FBDEV.dev="/dev/fb0"
+
+
+　　//or "/dev/fbX"
+
+
+　　//it's your frame buffer.
+
+
+　　int fb_open(PFBDEV pFbdev);
+
+
+　　//close a frame buffer
+
+
+　　int fb_close(PFBDEV pFbdev);
+
+
+　　//get display depth
+
+
+　　int get_display_depth(PFBDEV pFbdev);
+
+
+　　//full screen clear
+
+
+　　void fb_memset(void *addr, int c, size_t len);
+
+
+　　#endif 
+
+
+　　/******************
+
+
+　　File name : fbtools.c
+
+
+　　*/
+
+
+　　#include <stdio.h>
+
+
+　　#include <stdlib.h>
+
+
+　　#include <fcntl.h>
+
+
+　　#include <unistd.h>
+
+
+　　#include <string.h>
+
+
+　　#include <sys/ioctl.h>
+
+
+　　#include <sys/mman.h>
+
+
+　　#include <asm/page.h>
+
+
+　　#include "fbtools.h"
+
+
+　　#define TRUE 1
+
+
+　　#define FALSE 0
+
+
+　　#define MAX(x,y) ((x)>(y)?(x)y))
+
+
+　　#define MIN(x,y) ((x)<(y)?(x)y))
+
+
+　　//open & init a frame buffer
+
+
+　　int fb_open(PFBDEV pFbdev)
+
+
+　　{
+
+
+　　pFbdev->fb = open(pFbdev->dev, O_RDWR);
+
+
+　　if(pFbdev->fb < 0)
+
+
+　　{
+
+
+　　printf("Error opening %s: %m. Check kernel config\n", pFbdev->dev);
+
+
+　　return FALSE;
+
+
+　　}
+
+
+　　if (-1 == ioctl(pFbdev->fb,FBIOGET_VSCREENINFO,&(pFbdev->fb_var)))
+
+
+　　{
+
+
+　　printf("ioctl FBIOGET_VSCREENINFO\n");
+
+
+　　return FALSE;
+
+
+　　}
+
+
+　　if (-1 == ioctl(pFbdev->fb,FBIOGET_FSCREENINFO,&(pFbdev->fb_fix)))
+
+
+　　{
+
+
+　　printf("ioctl FBIOGET_FSCREENINFO\n");
+
+
+　　return FALSE;
+
+
+　　}
+
+
+　　//map physics address to virtual address
+
+
+　　pFbdev->fb_mem_offset = (unsigned long)(pFbdev->fb_fix.smem_start) & (~PAGE_MASK);
+
+
+　　pFbdev->fb_mem = (unsigned long int)mmap(NULL, pFbdev->fb_fix.smem_len + pFbdev->fb_mem_offset, PROT_READ | PROT_WRITE, MAP_SHARED, pFbdev->fb, 0);
+
+
+　　if (-1L == (long) pFbdev->fb_mem)
+
+
+　　{
+
+
+　　printf("mmap error! mem:%d offset:%d\n", pFbdev->fb_mem, pFbdev->fb_mem_offset);
+
+
+　　return FALSE;
+
+
+　　}
+
+
+　　return TRUE;
+
+
+　　}
+
+
+　　//close frame buffer
+
+
+　　int fb_close(PFBDEV pFbdev)
+
+
+　　{
+
+
+　　close(pFbdev->fb);
+
+
+　　pFbdev->fb=-1;
+
+
+　　}
+
+
+　　//get display depth
+
+
+　　int get_display_depth(PFBDEV pFbdev);
+
+
+　　{
+
+
+　　if(pFbdev->fb<=0)
+
+
+　　{
+
+
+　　printf("fb device not open, open it first\n");
+
+
+　　return FALSE;
+
+
+　　}
+
+
+　　return pFbdev->fb_var.bits_per_pixel;
+
+
+　　}
+
+
+　　//full screen clear
+
+
+　　void fb_memset (void *addr, int c, size_t len)
+
+
+　　{
+
+
+　　memset(addr, c, len);
+
+
+　　}
+
+
+　　//use by test
+
+
+　　#define DEBUG
+
+
+　　#ifdef DEBUG
+
+
+　　main()
+
+
+　　{
+
+
+　　FBDEV fbdev;
+
+
+　　memset(&fbdev, 0, sizeof(FBDEV));
+
+
+　　strcpy(fbdev.dev, "/dev/fb0");
+
+
+　　if(fb_open(&fbdev)==FALSE)
+
+
+　　{
+
+
+　　printf("open frame buffer error\n");
+
+
+　　return;
+
+
+　　}
+
+
+　　fb_memset(fbdev.fb_mem + fbdev.fb_mem_offset, 0, fbdev.fb_fix.smem_len);
+
+
+　　fb_close(&fbdev);
+
+
+　　}
+
+
+　　（二）基于Linux核心的汉字显示的尝试
+
+
+　　我们以一个简单的例子来说明字符显示的过程。我们假设是在虚拟终端1（/dev/tty1）下运行一个如下的简单程序。
+
+
+　　main ( )
+
+
+　　{
+
+
+　　puts("hello, world.\n");
+
+
+　　}
+
+
+　　puts 函数向缺省输出文件(/dev/tty1)发出写的系统调用write(2)。系统调用到linux核心里面对应的核心函数是console.c中的 con_write()，con_write()最终会调用do_con_write( )。在do_con_write( )中负责把"hello, world.\n"这个字符串放到tty1对应的缓冲区中去。
+
+
+　　do_con_write( )还负责处理控制字符和光标的位置。让我们来看一下do_con_write()这个函数的声明。
+
+
+　　static int do_con_write(struct tty_struct * tty, int from_user, const unsigned char *buf, int count)
+
+
+　　其中tty是指向tty_struct结构的指针，这个结构里面存放着关于这个tty的所有信息（请参照 linux/include/linux/tty.h）。Tty_struct结构中定义了通用（或高层）tty的属性（例如宽度和高度等）。在 do_con_write( )函数中用到了tty_struct结构中的driver_data变量。driver_data是一个vt_struct指针。在vt_struct结 构中包含这个tty的序列号（我们正使用tty1，所以这个序号为1）。Vt_struct结构中有一个vc结构的数组vc_cons，这个数组就是各虚 拟终端的私有数据。
+
+
+　　static int do_con_write(struct tty_struct * tty, int from_user,const unsigned char *buf, int count)
+
+
+　　{
+
+
+　　struct vt_struct *vt = (struct vt_struct *)tty->driver_data;//我们用到了driver_data变量
+
+
+　　. . . . .
+
+
+　　currcons = vt->vc_num; file://我们在这里的vc_nums就是1
+
+
+　　. . . . .
+
+
+　　}
+
+
+　　要访问虚拟终端的私有数据，需使用vc_cons〔currcons〕.d指针。这个指针指向的结构含有当前虚拟终端上光标的位置、缓冲区的起始地址、缓冲区大小等等。
+
+
+　　"hello, world.\n"中的每一个字符都要经过conv_uni_to_pc( )这个函数转换成８位的显示字符。这要做的主要目的是使不同语言的国家能把１６位的UniCode码映射到8位的显示字符集上，目前还是主要针对欧洲国家 的语言，映射结果为8位，不包含对双字节（double byte）的范围。
+
+
+　　这种UNICODE到显示字符的映射关系可以由用户自行定义。在缺省的映射表上，会把中文的字符映射到其他的字符上，这是我们不希望看到也是不需要的。所以我们有两个选择∶
+
+
+　　不进行conv_uni_to_pc( )的转换。 
+
+
+　　加载符合双字节处理的映射关系，即对非控制字符进行1对1的不变映射。我们自己定制的符合这种映射关系的UNICODE码表是direct.uni。要想查看/装载当前系统的unicode映射表，可使外部命令loadunimap。 
+
+
+　　经过conv_uni_to_pc( )转换之后，"hello, world.\n"中的字符被一个一个地填写到tty1的缓冲区中。然后do_con_write( )调用下层的驱动，把缓冲区中的内容输出到显示器上（也就相当于把缓冲区的内容拷贝到VGA显存中去）。
+
+
+　　sw->con_putcs(vc_cons〔currcons〕.d, (u16 *)draw_from, (u16*)draw_to-(u16 *)draw_from, y, draw_x);
+
+
+　　之所以要调用底层驱动，是因为存在不同的显示设备，其对应VGA显存的存取方式也不一样。
+
+
+　　上面的Sw->con_putcs( )就会调用到fbcon.c中的fbcon_putcs()函数（con_putcs是一个函数的指针，在Framebuffer模式下指向 fbcon_putcs()函数）。也就是说在do_con_write( )函数中是直接调用了fbcon_putcs()函数来进行字符的绘制。比如说在256色模式下，真正负责输出的函数是void fbcon_cfb8_putcs(struct vc_data *conp, struct display *p,const unsigned short *s, int count, int yy, int xx)
+
+
+　　显示中文
+
+
+　　比如说我们试图输出一句中文∶putcs(你好\n );（你好的内码为0xc4,0xe3,0xba,0xc3）。这时候会怎么样呢，有一点可以肯定，＂你好＂肯定不会出现在屏幕上，因为核心中没有汉字字库，中文显示就是无米之炊了．
+
+
+　　1 在负责字符显示的void fbcon_cfb8_putcs( )函数中，原有操作如下∶对于每个要显示的字符，依次从虚拟终端缓冲区中以WORD为单位读取（低位字节是ASCII码，高8位是字符的属性），由于汉字 是双字节编码方式，所以这种操作是不可能显示出汉字的，只能显示出xxxx_putcs()是一个一个VGA字符．
+
+
+　　要解决的问题∶
+
+
+　　确保在do_con_write( )时uni_pc转换不会改变原有编码。一个很直接的实现方式就是加载一个我们自己定制的UNICODE映射表，loadunimapdirect.uni，或者直接把direct.uni置为核心的缺省映射表。
+
+
+　　针对如上问题，我们要做的第一个尝试方案是如下。
+
+
+　　首先需要在核心中加载汉字字库，然后修改fbcon_cfb8_putcs()函数，在 fbcon_cfb8_putcs( )中一次读两个WORD，检查这两个WORD的低位字节是否能拼成一个汉字，如果发现能拼成一个汉字，就算出这个汉字在汉字字库中的偏移，然后把它当成一 个16 x 16的VGA字符来显示。
+
+
+　　试验的结果表明∶
+
+
+　　能够输出汉字，但仍有许多不理想的地方，比如说，输出以半个汉字开始的一串汉字，则这半个汉字后面的汉字都会是乱码。这是半个汉字的问题。 
+
+
+　　光标移动会破坏汉字的显示。表现为，光标移动过的汉字会变成乱码。这是因为光标的更新是通过xxxx_putc( )函数来完成的。 
+
+
+　　xxxx_putc( )函数与xxxx_putcs( )函数实现的功能类似，但是xxxx_putc()函数只刷新一个字符而不是一个字符串，因而xxxx_putc()的输入参数是一个整数，而不是一个字 符串的地址。Xxxx_putc( )函数的声明如下∶void fbcon_cfb8_putc(struct vc_data *conp, struct display *p, int c, int yy, int xx)
+
+
+　　下一个尝试方案就是同时修改xxxx_putcs( )函数和xxxx_putc()函数。为了解决半个汉字的问题，每一次输出之前，都从屏幕当前行的起始位置开始扫描，以确定要输出的字符是否落在半个汉字 的位置上。如果是半个汉字的位置，则进行相应的调整，即从向前移动一个字节的位置开始输出。
+
+
+　　这个方案有一个困难，即xxxx_putc( )函数不用缓冲区的地址，而是用一个整数作为参数。所以xxxx_putc( )无法直接利用相邻的字符来判别该定符是否是汉字。
+
+
+　　解决方案是，利用xxxx_putc( )的光标位置参数（yy, xx），可以逆推出该字符在缓冲区中的位置。但仍有一些小麻烦，在Linux的虚拟终端下，用户可能会上卷该屏幕（shift + pageup），导致光标的y座标和相应字符在缓冲区的行数不一致。相应的解决方案是，在逆推的过程中，考虑卷屏的参量。
+
+
+　　这样一来，我们就又进了一步，得到了一个相对更好的版本。但仍有问题没有解决。敲入 turbonetcfg，会发现菜单的边框字符也被当成汉字显示。这是因为，这种边框字符是扩展字符，也使用了字符的第8位，因而被当作汉字来显示。例 如，单线一的制表符内码为0xC4，当连成一条长线就是由一连串0xC4组成，而0xC4C4正是汉字哪。于是水平的制表符被一连串的哪字替代了。要解决这个问题就非常不容易了，因为制表符的种类比较多，而且垂直制表符与其后面字符的组合型式又多种多样，因而很难判断出相应位置的字符是不是制表符，从理论上说，无论采取什么样的排除算法，都必然存在误判的情况，因为总存在二义性，没有充足的条件来推断出当前字符究竟是制表符还是汉字。
+
+
+　　我们一方面寻找更好的排除组合算法，一方面试图寻找其它的解决方案。要想从根本上解决定个问题，必须利用其它的辅助信息，仅仅从缓冲区的字符来判断是不够的。
+
+
+　　经过一番努力，我们发现，在UNIX中使用扩展字符时，都要先输出字符转义序列（Escape sequence）来切换当前字符集。字符转义序列是以控制字符Esc为首的控制命令，在UNIX的虚拟终端中完成终端控制命令，这种命令包括，移动光标 座标、卷屏、删除、切换字符集等等。也就是说在输出代表制表符的字符串之前，通常是要先输出特定的字符转义序列。在console.c里，有根据字符转义 序列命令来记录字符状态的变量。结合该变量提供的信息，就可以非常干净地把制表符与汉字区别开来。
+
+
+　　在如上思路的指引下，我们又产生了新的解决方案。经过改动得到了另一各版本．
+
+
+　　在这个新版本上，turbonetcfg在初次绘制的时候，制表符与汉字被清晰地区分开来，结果是非常正确 的。但还有新的问题存在∶turbonetcfg 在重绘的时候（如切换虚拟终端或是移动鼠标光标的时候），制表符还是变成了汉字，因为重绘完全依赖于缓冲区，而这时用来记录字符集状态的变量并不反映当前 字符集状态。问题还是没有最终解决。我们又回到了起点。∶( 看来问题的最终解决手段必须是把字符集的状态伴随每一个字符存在缓冲区中。让我们来研究一下缓冲区的结构。每一个字符占用16bit的缓冲区，低8位是 ASCII值，完全被利用，高8位包含前景颜色和背景颜色的属性，也没有多余的空间可以利用。因而只能另外开辟新的缓冲区。为了保持一致性，我们决定在原 来的缓冲区后面添加相同大小的缓冲区，用来存放是否是汉字的信息。
+
+
+　　也许有读者会问，我们只需要为每个字符添加一bit的信息来标志是否是汉字就足够了，为什么还要开辟与原缓冲区大小相同的双倍缓冲区，是不是太浪费呢？我们先放下这个问题，稍后再作回答。
+
+
+　　其实，如果再添加一bit来标志是当前字符是汉字的左半边还是右半边的话，就会省去扫描屏幕上当前整行字符串的工作，这样一来，编程会更简单。但是有读者会问，即使是这样，使用8bit总够用了吧？为什么还要使用16bit呢？
+
+
+　　我们的作法是∶用低8位来存放汉字另外一半的内码，用高8位中的2 bit来存放上面所讲的辅助信息，高8位的剩余6位可以用来存放汉字或其它编码方式（如BIG5或日文、韩文）的信息，从而使我们可以实现同屏显示多种双 字节语言的字符而不会有相互干扰。另外，在编程时，双倍缓冲也比较容易计算。这样我们就回答了如上的两个问题。
+
+
+　　迄今为止，我们有了一套彻底解决汉字和制表符相互干扰、半个汉字的刷新、重绘等问题的方案。剩下的就是具体编程实现的问题了。
+
+
+　　但是，由于Framebuffer的驱动很多，修改每一个驱动的xxxx_putc()函数和 xxxx_putcs( )函数会是一项不小的工作，而且，改动驱动程序后，每种驱动的测试也是很麻烦的，尤其是对于有硬件加速的显卡，修改和测试会更不容易。那么，存不存在一种 不需要修改显卡驱动程序的方法呢？
+
+
+　　经过努力，我们发现，可以在调用xxxx_putcs( )或xxxx_putc()函数输出汉字之前，修改vga字库的指针使其指向所需显示的汉字在汉字字库中的位置，即把一个汉字当成两个vga ASCII字符输出。也就是说，在内核中存在两个字库，一个是原有的vga字符字库，另一个是汉字字库，当我们需要输出汉字的时候，就把vga字库的指针 指向汉字字库的相应位置，汉字输出完之后，再把该指针指向vga字库的原有位置。
+
+
+　　这样一来，我们只需要修改fbcon.c和console.c，其中console.c负责维护双倍缓冲 区，把每一个字符的信息存入附加的缓冲区；而fbcon.c负责利用双倍缓冲区中附加的信息，调整vga字库的指针，调用底层的显示驱动程序。这里还有几 个需要注意的地方∶
+
+
+　　由于屏幕重绘等原因，调用底层驱动xxxx_putc( )和xxxx_putcs()的地方有多处。我们作了两个函数分别包装这两个调用，完成替换字库、调用xxxx_putcs( )或xxxx_putc( )、恢复字库等功能。 
+
+
+　　为了实现向上滚屏（shift + pageup）时也能看到汉字，我们需要作另外的修改。
+
+
+　　Linux 在设计虚拟终端的时候，提供了回顾被卷出屏幕以外的信息的功能，这就是用热键来向上滚屏（shift + pageup）。当前被使用的虚拟终端拥有一个公共的缓冲区（soft back），用来存放被滚出屏幕以外的信息。当切换虚拟终端的时候，公共缓冲区的内容会被清除而被新的虚拟终端使用。向上滚屏的时候，显示的是公共缓冲区 中的内容。因此，如果我们想在向上滚屏的时候看到汉字，公共缓冲区也必须加倍，以确保没有信息丢失。当滚出屏幕的信息向公共缓冲区填写的时候，必须把相应 的附加信息也填写进公共缓冲区的附加区域。这就要求fbcon.c必须懂得利用公共缓冲区的附加信息。
+
+
+　　当然，有另外一种偷懒的方法，那就是不允许用户向上滚屏，从而避免对公区缓冲区的处理。 
+
+
+　　把不同的编码方式（GB、BIG5、日文和韩文）写成不同的module，以实现动态加载，从而使得扩展新的编码方式不需要重新编译核心。 
+
+
+　　测试
+
+
+　　本文实现的Kernel Patch文件（patch.kernel.chinese）可以从http://www.turbolinux.com.cn下载。Cd /usr/src/（该目录下应有Linux核心源程序所在的目录linux/） patch -p0 -b < patch.kernel.chinese make menuconfig 请选择Console drivers选项中的
+
+
+　　〔*〕 Double Byte Character Display Support(EXPERIMENTAL)
+
+
+　　〔*〕 Double Byte GB encode (module only)
+
+
+　　〔*〕 VESA VGA graphics console
+
+
+　　<*> Virtual Frame Buffer support (ONLY FOR TESTING!)
+
+
+　　<*> 8 bpp packed pixels support
+
+
+　　<*> 16 bpp packed pixels support
+
+
+　　<*> VGA characters/attributes support
+
+
+　　〔*〕 Select compiled-in fonts
+
+
+　　〔*〕VGA 8x8 font
+
+
+　　〔*〕VGA 8x16 font
+
+
+　　make dep
+
+
+　　make bzImage
+
+
+　　make modules
+
+
+　　make install
+
+
+　　make modules_install
+
+
+　　然后用新的核心启动。
+
+
+　　Insmod encode-gb.o 
+
+
+　　四、其它
+
+
+　　（一） 设置FrameBuffer
+
+
+　　FrameBuffer，可以译作"帧缓冲"，有时简称为 fbdrv，基于fbdrv的console也被称之为fbcon。这是一种独立于硬件的抽象图形设备。FrameBuffer的优点在于其高度的可移植 性、易使用性、稳定性。使用Linux内核的 FrameBuffer驱动（vesafb），可以轻松支持到1024X768X32bpp以上的分辩率。而且目前可得到的绝大多数linux版本所发行 的内核中，已经预编译了FrameBuffer支持，通常不需要重新编译内核就可以使用。所以FrameBuffer也是zhcon推荐使用的驱动方式。
+
+
+　　进入FrameBuffer可以简单地在系统启动时向kernel传送vga=mode-number的参数来激活FrameBuffer设备，如：
+
+
+　　lilo:linux vga="305"
+
+
+　　将会启动1024x768x8bpp模式。
+
+
+　　640x480 800x600 1024x768 1280x1024
+
+
+　　8 bpp 769 771 773 775
+
+
+　　16 bpp 785 788 791 794
+
+
+　　32 bpp 786 789 792 795
+
+
+　　（二） 要使linux缺省进入FrameBuffer，可以修改/etc/lilo.conf，加入一下语句：
+
+
+　　vga=0x303
+
+
+　　退出编辑，执行：
+
+
+　　lilo -v
+
+
+　　重新启动linux，可以使其进入800x600的256色模式。
+
+
+　　grub也是一样，在grub.conf中的kernel行后面写上vga=xxx就行了，也可以用vga=ask，让系统启动的时候询问你用多大的分辨率
+
+
+　　（三）我编译内核时，选择framebuffer模式，启动时屏幕上有一企鹅图片，不知这是如何造成的这个图片可以去掉或改动吗？
+
+　　可以将drivers/video/fbcon.c: fbcon_setup()中if (logo) { } 代码去掉
+
+
+=======================
+
+
+
+Arm Linux LCD应用程序 For Mini2440
+
+[日期：2010-10-28] 来源：Linux社区  作者：Linux [字体：大 中 小]  
+
+
+
+
+  
+
+  
+
+
+
+应用程序实现//mini2440实现 
+
+#include <unistd.h>
+#include <stdlib.h>
+
+#include <fcntl.h>
+#include <linux/fb.h>
+#include <sys/mman.h>
+int main()
+{
+    int fbfd = 0;
+    struct fb_var_screeninfo vinfo;
+    struct fb_fix_screeninfo finfo;
+    long int screensize = 0;
+    char *fbp = 0;
+    int x = 0, y = 0;
+    long int location = 0;
+
+    // Open the file for reading and writing
+
+     fbfd = open("/dev/fb0", O_RDWR);
+    if (!fbfd) {
+        printf("Error: cannot open framebuffer device.\n");
+        exit(1);
+    }
+    printf("The framebuffer device was opened successfully.\n");
+
+    // Get fixed screen information
+
+    //FBIOGET_FSCREENINFO获得固定的屏幕参数设置
+
+    if (ioctl(fbfd, FBIOGET_FSCREENINFO, &finfo)) {
+        printf("Error reading fixed information.\n");
+        exit(2);
+    }
+
+    printf("%d, %d, %d, %d\n", finfo.smem_start, finfo.smem_len, finfo.mmio_start,finfo.mmio_len);
+    //869007360, 153600, 0, 0
+
+    // Get variable screen information
+
+    //FBIOGET_VSCREENINFO 获得可变的屏幕参数
+
+    if (ioctl(fbfd, FBIOGET_VSCREENINFO, &vinfo)) {
+        printf("Error reading variable information.\n");
+        exit(3);
+    }
+
+    printf("%dx%d, %dbpp\n", vinfo.xres, vinfo.yres, vinfo.bits_per_pixel);
+    //320X240,16bpp bpp 每像素位数 每个点用多少个字节表示
+
+
+    // Figure out the size of the screen in bytes
+
+     screensize = vinfo.xres * vinfo.yres * vinfo.bits_per_pixel / 8;
+    //2^16=64K TFT 320*240*16/8=153600byte
+
+
+    // Map the device to memory
+
+    /*void *mmap(void *start, size_t length, int prot, int flags,
+　　int fd, off_t offset);mmap函数是unix/linux下的系统调用
+     fbmem.c是内核的，应用程序调用了mmap进入内核空间就是执行的fb_mmap了，
+     应用程序是统一的接口，但是在内核空间，不同的驱动使用的实现函数是不一样的*/
+    //#include <unistd.h> and #include <sys/mman.h> /usr/include/sys/mman.h
+
+     fbp = (char *)mmap(0, screensize, PROT_READ | PROT_WRITE, MAP_SHARED,
+                        fbfd, 0);
+    if ((int)fbp == -1) {
+        printf("Error: failed to map framebuffer device to memory.\n");
+        exit(4);
+    }
+    printf("The framebuffer device was mapped to memory successfully.\n");
+#if 1
+     x = 10; y = 10; // Where we are going to put the pixel
+
+
+    // Figure out where in memory to put the pixel
+
+    for (y = 10; y < 20; y++)
+        for (x = 10; x < 30; x++) 
+        {
+             location = (x+vinfo.xoffset) * (vinfo.bits_per_pixel/8) +
+                       (y+vinfo.yoffset) * finfo.line_length;
+
+            if (vinfo.bits_per_pixel == 32) 
+            {
+                *(fbp + location) = 10; // Some blue
+
+                *(fbp + location + 1) = 15+(x-10)/2; // A little green
+
+                *(fbp + location + 2) = 20-(y-10)/5; // A lot of red
+
+                *(fbp + location + 3) = 0; // No transparency
+
+            } 
+            else 
+            { //assume 16bpp
+
+                unsigned short b = 10;
+                unsigned short g = (x-10)/6; // A little green
+
+                unsigned short r = 31-(y-10)/16; // A lot of red
+
+                unsigned short t = r<<11 | g << 5 | b;
+                *((unsigned short *)(fbp + location)) = t;
+    //     printf("x=%d,%d\n",x,y);
+
+            }
+        }
+#endif
+     munmap(fbp, screensize);//删除特定地址区域的对象映射 int munmap(void *start, size_t length); 
+
+    printf("The framebuffer device was munmapped to memory successfully.\n");
+    close(fbfd);
+    printf("The framebuffer device was closed successfully.\n");
+    return 0;
+}
+linux

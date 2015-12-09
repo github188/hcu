@@ -1,0 +1,1010 @@
+http://blog.csdn.net/jixiuffff/article/details/5709976
+
+ 关于ffmpeg 的总结（一个linux 下 集 屏幕录像录音，音频视频转换，合并音频视频文件，格式转换于一身的命令）
+标签： linuxvideoinputaudioaviflv
+2010-07-02 19:38 24608人阅读 评论(8) 收藏 举报
+ 分类： linux（56）  
+版权声明：本文为博主原创文章，未经博主允许不得转载。
+
+目录(?)[+]
+ 
+
+当然先安装了 gentoo 下一条命令搞定
+
+emerge  ffmpeg
+
+ 格式转换 (将file.avi 转换成output.flv)
+
+     ffmpeg -i  file.avi   output.flv
+
+       -i 表示输入文件 
+
+ :现在有个视频video.avi，有个音频 audio.mp3，将其合并成output.avi
+
+两个命令                     （ video2.avi 是中间文件 ，用完可删）
+
+ffmpeg -i video.avi -vcodec copy -an video2.avi   
+ffmpeg -i video2.avi -i audio.mp3 -vcodec copy -acodec copy output.avi
+
+ -i 表示输入文件
+
+  -vcodec copy 表示 force video codec ('copy' to copy stream) 这个不知怎么译 ，估计是直接copy 
+
+  -acodec copy   这个说的应该是音频了   跟上面一样
+
+-an : 表示  disable audio  估计是audio no 之类的缩写   表示去掉video.avi 原有的音频
+
+方法2 好像可以直接指定两个输入文件 ，
+
+ffmpeg -i /tmp/a.wav  -i /tmp/a.avi /tmp/a.avi   两个文件 的顺序很重
+
+从视频里提取声音（声音与视频的分离）
+
+ ffmpeg  -i 人生若只如初见.flv  -vn r.mp3  从flv 文件 中提取声音并保存为mp3 格式  
+
+       -vn : 表示忽略视频 估计是video no 之类的缩写
+
+ ffmpeg  -i 人生若只如初见.flv  -an  r.flv   只留视频不留声音 
+
+    -an : 表示 忽略 声音 估计是audio no 之类的缩写
+
+
+
+从视频里提取图片（ ）
+
+ffmpeg -i test.avi -y -f image2 -ss 8 -t 0.001 -s 350x240 test.jpg       
+
+ -ss 第8秒处 截一图
+
+
+压缩mp3 文件
+
+如果你觉得mp3 文件 有点大，想变小一点那么可以通过-ab 选项改变音频的比特率 （bitrate）
+
+ffmpeg -i input.mp3 -ab 128 output.mp3    //这里将比特率设为128
+
+你可以用file 命令查看一下源文件 的信息
+
+z.mp3: Audio file with ID3 version 2.3.0, contains: MPEG ADTS, layer III, v1, 192 kbps, 44.1 kHz, Stereo
+
+其中的192 kbps 就是这个东西
+
+mp3中比特率的含义是：在压缩音频文件至mp3时，由压缩软件所确定数码文件在播放时每秒传 送给播放器大小，其单位是：千位/秒；英文的含义是：kbps - = kilobits per second。现在mp3文件的最高数位率是320 kbps。这样的文件体积很大，每分钟的音乐超过两兆字节。如果采用可变比特率（VBR）编码来生成mp3文件，获得与320 kbps相当音质，文件的体积会缩小25~50%。请注意：播放时间相同，而歌曲不同，所获的压缩mp3文件的一般不相同，这是因为VBR编码所生成的 mp3文件的大小不仅仅取决于播放时间的长度，还取决于源音频文件的其它因素。
+
+
+
+录音（要有可用的麦克风，并且如果用alsa 的话，好像得安alsa-oss，重启） 
+
+ ffmpeg  -f oss -i /dev/dsp   out.avi  (should  hava oss or alsa-oss)
+
+ ffmpeg   -f  alsa -ac 2 -i hw:0, 0  out.avi   (should )
+
+ ffmpeg   -f alsa -ac 2 -i pulse  (should hava PulseAudio)
+
+ 
+
+   oss 是linux 下的声音相关的东西，与alsa 一样，不过oss 是商业的， 而/dev/dsp 是oss 用到的麦克的设备吧，可以这样理解
+
+屏幕录像
+
+ffmpeg -f x11grab -s xga -r 10 -i :0.0+0+0 wheer.avi 
+
+ffmpeg -f x11grab  -s 320x240  -r 10 -i :0.0+100+200 wheer.avi
+
+:0:0 表示屏幕（个人理解，因为系统变量$DISPLAY值就是:0.0）  而100,表示距左端100象素，200表示距上端200
+
+-s 设置窗口大小
+
+  -r 10 好像是设置频率，不懂
+
+ffmpeg -f x11grab -s xga    -qscale 5    -r 10 -i :0.0+0+0 wheer.avi 
+
+-qscale 8 设定画面质量，值 越小越好
+
+屏幕录像，同时录音
+
+ffmpeg -f oss -i /dev/dsp        -f x11grab -r 30 -s 1024x768 -i :0.0  output.mkv
+
+ffmpeg   -ac 2 -f oss  -i  /dev/dsp   -f x11grab -r 30 -s 1024x768 -i :0.0 -acodec pcm_s16le -vcodec libx264 -vpre lossless_ultrafast -threads 0 output.mkv
+
+看到这，你会发现这个命令有多强大，
+
+如果我屏幕上打开了一个窗口，我只想录这个窗口的内容，如何确定这个窗口的坐标位置呢
+
+可以用另外一个命令
+
+xwininfo 输入这个命令后，用鼠标点选目标窗口，
+
+就会出现目标窗口的坐标，宽高等一系列信息
+
+Absolute upper-left X:  276
+  Absolute upper-left Y:  57
+  Relative upper-left X:  2
+  Relative upper-left Y:  23
+  Width: 742
+  Height: 499
+  Depth: 24
+  Visual: 0x21
+  Visual Class: TrueColor
+  Border width: 0
+  Class: InputOutput
+  Colormap: 0x20 (installed)
+  Bit Gravity State: NorthWestGravity
+  Window Gravity State: NorthWestGravity
+  Backing Store State: NotUseful
+  Save Under State: no
+  Map State: IsViewable
+  Override Redirect State: no
+  Corners:  +276+57  -262+57  -262-244  +276-244
+  -geometry 80x24+274+34 看到这一行了没 (）
+
+ 
+
+比如根据上面的信息
+
+ffmpeg -f oss  -i  /dev/dsp      -f  x11grab -r 30  -s 1280x752 -i :0.0+0+23  output.avi 
+Another thing you can change is the video frame rate (FPS). In the example above we used -r 30 which means capture at 30 FPS. You can change this value to whatever frame rate you want.
+
+这个 -r 30 应该是每秒钟取样几次，估计是一秒截三十次屏，
+
+切头去尾
+
+ ffmpeg -ss 00:00:10 -t 00:01:22 -i 五月天-突然好想你.mp3  output.mp3 
+
+只要 从第10秒开始截取，共截取1：22时长的内容
+
+视频文件的连接，如两个flv 文件 连接成一
+
+
+好像必须先将文件 转成mpg ，dv 等格式的文件后才能进行连接
+
+连接复数的AVI影片档之范例（在此范例中须一度暂时将AVI档转换成MPEG-1档(MPEG-1, MPEG-2 PS, DV格式亦可连接)）
+ffmpeg -i input1.avi -sameq inputfile_01.mpg -r 20
+
+ffmpeg -i input2.avi -sameq inputfile_02.mpg  -r 20
+
+cat inputfile_01.mpg inputfile_02.mpg > inputfile_all.mpg
+
+ffmpeg -i inputfile_all.mpg -sameq outputfile.avi
+
+上面将  input1.avi    input2.avi 合并成outputfile.avi
+
+-sameq  表示  相同的质量（可能指的是画面，不太清楚）
+
+ -r 指频率
+
+=====================================================================下面是wiki 上给的几个例子
+参数
+FFmpeg可使用众多参数，参数内容会根据ffmpeg版本而有差异，使用前建议先参考参数及编解码器的叙述。此外，参数明细可用 ffmpeg -h 显示；编解码器名称等明细可用 ffmpeg -formats 显示。
+
+下列为较常使用的参数。
+
+[编辑 ] 主要参数
+-i 设定输入档名。
+-f 设定输出格式。
+-y 若输出档案已存在时则覆盖档案。
+-fs 超过指定的档案大小时则结束转换。
+-ss 从指定时间开始转换。
+-title 设定标题。
+-timestamp 设定时间戳。
+-vsync 增减Frame使影音同步。
+[编辑 ] 影像参数
+-b 设定影像流量，默认为200Kbit/秒。（ 单位请参照下方注意事项 ）
+-r 设定FrameRate值，默认为25。
+-s 设定画面的宽与高。
+-aspect 设定画面的比例。
+-vn 不处理影像，于仅针对声音做处理时使用。
+-vcodec 设定影像影像编解码器，未设定时则使用与输入档案相同之编解码器。
+[编辑 ] 声音参数
+-ab 设定每Channel （最近的SVN 版为所有Channel的总合）的流量。（ 单位 请参照下方注意事项 ）
+-ar 设定采样率。
+-ac 设定声音的Channel数。
+-acodec 设定声音编解码器，未设定时与影像相同，使用与输入档案相同之编解码器。
+-an 不处理声音，于仅针对影像做处理时使用。
+-vol 设定音量大小，256为标准音量。(要设定成两倍音量时则输入512，依此类推。)
+[编辑 ] 注意事项
+以-b及ab参数设定流量时，根据使用的ffmpeg版本，须注意单位会有kbits/sec与bits/sec的不同。（可用ffmpeg -h显示说明来确认单位。）
+例如，单位为bits/sec的情况时，欲指定流量64kbps时需输入‘ -ab 64k ’；单位为kbits/sec的情况时则需输入‘ -ab 64 ’。
+以-acodec及-vcodec所指定的编解码器名称，会根据使用的ffmpeg版本而有所不同。例如使用AAC编解码器时，会有输入aac与 libfaac的情况。此外，编解码器有分为仅供解码时使用与仅供编码时使用，因此一定要利用ffmpeg -formats 确 认输入的编解码器是否能运作。
+[编辑 ] 范例
+将MPEG-1影片转换成MPEG-4格式之范例
+ffmpeg -i inputfile.mpg -f mp4 -acodec libfaac -vcodec mpeg4 -b 256k -ab 64k outputfile.mp4
+
+将MP3声音转换成MPEG-4格式之范例
+ffmpeg -i inputfile.mp3 -f mp4 -acodec libaac -vn -ab 64k outputfile.mp4
+
+将DVD的VOB档转换成VideoCD格式的MPEG-1档之范例
+ffmpeg -i inputfile.vob -f mpeg -acodec mp2 -vcodec mpeg1video -s 352x240 -b 1152k -ab 128k outputfile.mpg
+将AVI影片转换成H.264格式的M4V档之范例
+ffmpeg -i inputfile.avi -f mp4　-acodec libfaac -vcodec libx264 -b 512k -ab 320k outputfile.m4v
+将任何影片转换成东芝REGZA可辨识的MPEG2格式之范例
+ffmpeg -i inputfile -target ntsc-svcd -ab 128k -aspect 4:3 -s 720x480 outputfile.mpg
+连接复数的AVI影片档之范例（在此范例中须一度暂时将AVI档转换成MPEG-1档(MPEG-1, MPEG-2 PS
+DV格式亦可连接)、
+
+ffmpeg -i input1.avi -sameq inputfile_01.mpg
+
+ffmpeg -i input2.avi -sameq inputfile_02.mpg
+
+cat inputfile_01.mpg inputfile_02.mpg > inputfile_all.mpg
+
+ffmpeg -i inputfile_all.mpg -sameq outputfile.avi
+
+=============================================================================
+
+http://ffmpeg.org/ffmpeg-doc.html
+
+http://ubuntuforums.org/showthread.php?t=1392026
+同时搞明白的一些问在alsa 体系中声卡（也可能是麦克风，）叫hw:0,0 而在oss 体系中叫/dev/dsp (用词可能不太专业)  Linux在安装了声卡后，会有一些设备文件生成。
+
+ 采集数字样本的
+/dev/dsp文件，针对混音器的
+/dev/mixer文件，用于音序器的
+/dev/sequencer，/dev/audio文件一个基于兼容性考虑的声音设备文件。只要向/dev/audio中输入wav文件就能发出声音。而对/dev/dsp文件读取就能得到WAV文件格式的声音文件。
+
+==================================================================================================
+http://blog.sina.com.cn/s/blog_6eea02c50101629j.html
+
+FFmpeg在Linux下的简单安装并与Java结合获取视频缩略图功能实现 (2012-10-27 11:19:33)转载▼
+标签： it	
+【下载ffmpeg】：
+下载地址：http://download.chinaunix.net/download.php?id=5532&ResourceID=2990
+
+【解压】：
+        使用SSH或者FTP工具将下载的文件上传至linux服务器;
+解压：tar xvfj ffmpeg-0.4.9-p20051120.tar.bz2
+得到解压后的目录是ffmpeg-0.4.9-p20051120，名字太长，利用mv命令改为ffmpeg：mv ffmpeg-0.4.9-p20051120 ffmpeg
+
+【配置】：
+       进入ffmpeg解压目录：cd ffmpeg/
+进行配置：./configure --enable-shared --prefix=/usr/local/ffmpeg
+其中：--enable-shared 是允许其编译产生动态库，在以后的编程中要用到这个几个动态库。--prefix设置的安装目录。
+
+【编译并安装】：
+make
+make install
+
+【安装之后在/usr/local/ffmpeg会看到有三个目录】：
+lib 动态链接库位置
+include 编程要用到头文件
+bin 执行文件所在的目录
+
+【配置Path】：
+       安装完成以后并不能直接使用 ffmpeg 命令执行，系统会提示并没有这样的命令，需要进一步进行配置Path：
+编辑profile文件：
+        vi /etc/profile
+       i （插入）
+       在文件末尾加上两句话：
+       export FFMPEG_HOME=/usr/local/ffmpeg 
+       export PATH=$FFMPEG_HOME/bin:$PATH
+       保存并退出：按Esc键 输入:wq! 回车
+使修改生效：source /etc/profile
+
+【如果启动报错】：
+        若出现error while loading shared libraries:libavdevice.so.52错误，需要修改文件ld.so.conf。
+修改ld.so.conf：vi /etc/ld.so.conf
+       在末尾加上一句话：/usr/local/ffmpeg/lib
+       保存并退出：按Esc键 输入:wq! 回车
+       使修改生效：ldconfig -v
+修改/usr/local/ffmpeg/lib目录下的文件权限为777：
+       cd /usr/local/ffmpeg/lib/
+chmod 777 *
+       
+【使用Java与FFmpeg在linux上实现视频缩略图的截取】：
+ Java代码：
+  // 视频缩略图截取 
+ // inFile  输入文件(包括完整路径) 
+ // outFile 输出文件(可包括完整路径)
+ public static boolean transfer(String inFile, String outFile) { 
+ String command = "ffmpeg -i " + inFile + " -y -f image2 -ss 00:00:10 -t 00:00:01 -s 176x144 " + outFile; 
+ try { 
+ Runtime rt = Runtime.getRuntime(); 
+ Process proc = rt.exec(command); 
+ InputStream stderr = proc.getErrorStream(); 
+ InputStreamReader isr = new InputStreamReader(stderr); 
+ BufferedReader br = new BufferedReader(isr); 
+ String line = null; 
+ while ((line = br.readLine()) != null) 
+ System.out.println(line);
+  } catch (Throwable t) { 
+ t.printStackTrace(); 
+ return false; 
+  } 
+  return true; 
+  }
+        注意点：
+  在linux上生成视频缩略图的时候很有可能会出现，程序上没有抛出任何异常，但是就是缩略图没有生成，这个时候请考虑文件夹的权限问题， 往往是因为没有权限写入导致。可以对你要生成的文件夹添加最高权限，如相对test文件夹加权限：chmod 777 test/ 即可。
+
+【总结】：
+本文主要简单的介绍了FFmpeg的安装与简单的获取视频的缩略图功能，它还可以支持更多文件格式，做更多有用的事情，有兴趣的童鞋可以自行研究。
+
+
+================
+http://blog.csdn.net/jk110333/article/details/8978328
+ Linux ffmpeg命令的使用
+2013-05-27 09:06 4319人阅读 评论(0) 收藏 举报
+ 分类： SHELL&linux命令（35）  
+目录(?)[+]
+ffmpeg使用语法
+ffmpeg [[options][`-i' input_file]]... {[options] output_file}...
+
+如果没有输入文件，那么视音频捕捉（只在Linux下有效，因为Linux下把音视频设备当作文件句柄来处理）就会起作用。作为通用的规则，选项一 般用于下一个特定的文件。如果你给 –b 64选项，改选会设置下一个视频速率。对于原始输入文件，格式选项可能是需要的。缺省情况下，ffmpeg试图尽可能的无损转换，采用与输入同样的音频视 频参数来输出。
+
+ffmpeg转换所涉及到的选项较多，可参考ffmpeg选项详解。
+
+ffmpeg支持多种文件格式和多种音频、视频编码器，可参考ffmepg格式详解，（附：常见视频文件格式详解）
+视频文件截图
+截取一张352x240尺寸大小的，格式为jpg的图片
+ffmpeg -i test.asf -y -f image2 -t 0.001 -s 352x240 a.jpg
+
+把视频的前３０帧转换成一个Animated Gif
+ffmpeg -i test.asf -vframes 30 -y -f gif a.gif
+
+截取指定时间的缩微图
+ffmpeg -i test.avi -y -f image2 -ss 8 -t 0.001 -s 350x240 test.jpg
+
+-ss后跟的时间单位为秒
+转换文件为3GP格式
+ffmpeg -y -i test.mpeg -bitexact -vcodec h263 -b 128 -r 15 -s 176x144 
+
+-acodec aac -ac 2 -ar 22500 -ab 24 -f 3gp test.3gp
+
+或
+ffmpeg -y -i test.wmv -ac 1 -acodec libamr_nb -ar 8000 -ab 12200 -s 176x144 -b 128 -r 15 test.3gp
+
+视频格式转换
+如何使用 ffmpeg 编码得到高质量的视频
+ffmpeg.exe -i "D:\Video\Fearless\Fearless.avi" -target film-dvd -s 720x352
+
+-padtop 64 -padbottom 64 -maxrate 7350000 -b 3700000 -sc_threshold 1000000000 
+
+-trellis -cgop -g 12 -bf 2 -qblur 0.3 -qcomp 0.7 -me full -dc 10 -mbd 2
+
+-aspect 16:9 -pass 2 -passlogfile "D:\Video\ffmpegencode" -an -f mpeg2video "D:\Fearless.m2v"
+
+转换指定格式文件到FLV格式
+ffmpeg.exe -i test.mp3 -ab 56 -ar 22050 -b 500 -r 15 -s 320x240 f:\test.flv 
+
+ffmpeg.exe -i test.wmv -ab 56 -ar 22050 -b 500 -r 15 -s 320x240 f:\test.flv
+
+转码解密的VOB
+ffmpeg -i snatch_1.vob -f avi -vcodec mpeg4 -b 800 -g 300 -bf 2 -acodec mp3 -ab 128 snatch.avi
+
+上面的命令行将vob的文件转化成avi文件，mpeg4的视频和mp3的音频。注意命令中使用了B帧，所以mpeg4流是divx5兼容的。GOP大小是300意味着29.97帧频下每10秒就有INTRA帧。该映射在音频语言的DVD转码时候尤其有用。
+同时编码到几种格式并且在输入流和输出流之间建立映射
+ffmpeg -i /tmp/a.wav -ab 64 /tmp/a.mp2 -ab 128 /tmp/b.mp2 -map 0:0 -map 0:0
+
+上面的命令行转换一个64Kbits 的a.wav到128kbits的a.mp2 ‘-map file:index’在输出流的顺序上定义了哪一路输入流是用于每一个输出流的。
+转换文件为3GP格式
+ffmpeg -i test.avi -y -b 20 -s sqcif -r 10 -acodec amr_wb -ab 23.85 -ac 1 -ar 16000 test.3gp
+
+注：如果要转换为3GP格式，则ffmpeg在编译时必须加上–enable-amr_nb –enable-amr_wb，详细内容可参考：转换视频为3GPP格式
+转换文件为MP4格式（支持iPhone/iTouch）
+ffmpeg -y -i input.wmv -f mp4 -async 1-s 480x320 -acodec libfaac -vcodec libxvid -qscale 7 -dts_delta_threshold 1 output.mp4
+
+ffmpeg -y -i source_video.avi input -acodec libfaac -ab 128000 -vcodec mpeg4 -b 1200000 -mbd 2 -flags +4mv+trell -aic 2 -cmp 2 -subcmp 2 -s 320x180 -title X final_video.mp4
+
+将一段音频与一段视频混合
+ffmpeg -i son.wav -i video_origine.avi video_finale.mpg
+
+将一段视频转换为DVD格式
+ffmpeg -i source_video.avi -target pal-dvd -ps 2000000000 -aspect 16:9 finale_video.mpeg
+
+注：target pal-dvd : Output format ps 2000000000 maximum size for the output file, in bits (here, 2 Gb) aspect 16:9 : Widescreen
+转换一段视频为DivX格式
+ffmpeg -i video_origine.avi -s 320x240 -vcodec msmpeg4v2 video_finale.avi
+
+Turn X images to a video sequence
+ffmpeg -f image2 -i image%d.jpg video.mpg
+
+注：This command will transform all the images from the current directory (named image1.jpg, image2.jpg, etc...) to a video file named video.mpg.
+Turn a video to X images
+ffmpeg -i video.mpg image%d.jpg
+
+注：This command will generate the files named image1.jpg, image2.jpg, ...
+The following image formats are also availables : PGM, PPM, PAM, PGMYUV, JPEG, GIF, PNG, TIFF, SGI.
+屏幕录制
+使用ffmpeg录像屏幕
+ffmpeg -vcodec mpeg4 -b 1000 -r 10 -g 300 -vd x11:0,0 -s 1024x768 ~/test.avi
+
+：其中，-vd x11:0,0 指录制所使用的偏移为 x=0 和 y=0，-s 1024×768 指录制视频的大小为 1024×768。录制的视频文件为 test.avi，将保存到用户主目录中
+如果你只想录制一个应用程序窗口或者桌面上的一个固定区域，那么可以指定偏移位置和区域大小。使用xwininfo -frame命令可以完成查找上述参数。
+重新调整视频尺寸大小
+ffmpeg -vcodec mpeg4 -b 1000 -r 10 -g 300 -i ~/test.avi -s 800×600 ~/test-800-600.avi
+
+注：ffmpeg的屏幕录制功能只能在Linux环境下有效。
+视频采集
+把摄像头的实时视频录制下来，存储为文件
+ffmpeg -f video4linux -s 320*240 -r 10 -i /dev/video0 test.asf
+
+更多信息可参考ffmpeg工程组论坛的讨论贴：有关ffmpeg的视频采集
+注：ffmpeg的视频采集功能只能在Linux环境下使用
+使用ffmpeg压制H.264视频
+ffmpeg -threads 4 -i INPUT -r 29.97 -vcodec libx264 -s 480x272 -flags +loop -cmp +chroma -deblockalpha 0 -deblockbeta 0 -crf 24 
+
+-bt 256k -refs 1 -coder 0 -me umh -me_range 16 -subq 5 -partitions +parti4x4+parti8x8+partp8x8 -g 250 -keyint_min 25 -level 30 
+
+-qmin 10 -qmax 51 -trellis 2 -sc_threshold 40 -i_qfactor 0.71 -acodec libfaac -ab 128k -ar 48000 -ac 2 OUTPUT
+
+注：使用该指令可以压缩出比较清晰，而且文件转小的H.264视频文件
+
+
+=========
+命令集编辑
+ffmpeg 命令集举例
+1.获取视频的信息
+ffmpeg -i video.avi
+2.将图片序列合成视频
+ffmpeg -f image2 -i image%d.jpg video.mpg
+上面的命令会把当前目录下的图片（名字如：image1.jpg. image2.jpg. 等...）合并成video.mpg
+3.将视频分解成图片序列
+ffmpeg -i video.mpg image%d.jpg
+上面的命令会生成image1.jpg. image2.jpg. ...
+支持的图片格式有：PGM. PPM. PAM. PGMYUV. JPEG. GIF. PNG. TIFF. SGI
+4.为视频重新编码以适合在iPod/iPhone上播放
+ffmpeg -i source_video.avi input -acodec aac -ab 128kb -vcodec mpeg4 -b 1200kb -mbd 2 -flags +4mv+trell -aic 2 -cmp 2 -subcmp 2 -s 320x180 -title X final_video.mp4
+说明：
+* 源视频：source_video.avi
+* 音频编码：aac
+* 音频位率：128kb/s
+* 视频编码：mpeg4
+* 视频位率：1200kb/s
+* 视频尺寸：320 X 180
+* 生成的视频：final_video.mp4
+5.为视频重新编码以适合在PSP上播放
+ffmpeg -i source_video.avi -b 300 -s 320x240 -vcodec xvid -ab 32 -ar 24000 -acodec aac final_video.mp4
+说明：
+* 源视频：source_video.avi
+* 音频编码：aac
+* 音频位率：32kb/s
+* 视频编码：xvid
+* 视频位率：1200kb/s
+* 视频尺寸：320 X 180
+* 生成的视频：final_video.mp4
+6.从视频抽出声音.并存为Mp3
+ffmpeg -i source_video.avi -vn -ar 44100 -ac 2 -ab 192 -f mp3 sound.mp3
+说明：
+* 源视频：source_video.avi
+* 音频位率：192kb/s
+* 输出格式：mp3
+* 生成的声音：sound.mp3
+7.将wav文件转成Mp3
+ffmpeg -i son_origine.avi -vn -ar 44100 -ac 2 -ab 192 -f mp3 son_final.mp3
+8.将.avi视频转成.mpg
+ffmpeg -i video_origine.avi video_finale.mpg
+9.将.mpg转成.avi
+ffmpeg -i video_origine.mpg video_finale.avi
+10.将.avi转成gif动画（未压缩）
+ffmpeg -i video_origine.avi gif_anime.gif
+11.合成视频和音频
+ffmpeg -i son.wav -i video_origine.avi video_finale.mpg
+12.将.avi转成.flv
+ffmpeg -i video_origine.avi -ab 56 -ar 44100 -b 200 -r 15 -s 320x240 -f flv video_finale.flv
+13.将.avi转成dv
+ffmpeg -i video_origine.avi -s pal -r pal -aspect 4:3 -ar 48000 -ac 2 video_finale.dv
+或者：
+ffmpeg -i video_origine.avi -target pal-dv video_finale.dv
+14.将.avi压缩成divx
+ffmpeg -i video_origine.avi -s 320x240 -vcodec msmpeg4v2 video_finale.avi
+15.将Ogg Theora压缩成Mpeg dvd
+ffmpeg -i film_sortie_cinelerra.ogm -s 720x576 -vcodec mpeg2video -acodec mp3 film_terminate.mpg
+16.将.avi压缩成SVCD mpeg2
+NTSC格式：
+ffmpeg -i video_origine.avi -target ntsc-svcd video_finale.mpg
+PAL格式：
+ffmpeg -i video_origine.avi -target pal-svcd video_finale.mpg
+17.将.avi压缩成VCD mpeg2
+NTSC格式：
+ffmpeg -i video_origine.avi -target ntsc-vcd video_finale.mpg
+PAL格式：
+ffmpeg -i video_origine.avi -target pal-vcd video_finale.mpg
+18.多通道编码
+ffmpeg -i fichierentree -pass 2 -passlogfile ffmpeg2pass fichiersortie-2
+19.从flv提取mp3
+ffmpeg -i source.flv -ab 128k dest.mp3
+格式编辑
+支持的编码
+源自FFmpeg项目组的两个视频编码：
+Snow
+FFV1
+支持的格式
+ASF
+AVI
+BFI[7]
+IFF[8]
+RL2[9]
+FLV
+MXF, Material eXchange Format, SMPTE 377M
+Matroska
+Maxis XA[10]
+MSN Webcam stream[11]
+MPEG transport stream
+TXD[6]
+OMA[12]
+GXF, General eXchange Format, SMPTE 360M
+mov,mp4,m4a,3gp,
+协议编辑
+支持的协议
+HTTP
+RTP
+RTSP
+RealMedia RTSP/RDT
+TCP
+UDP
+Gopher
+RTMP
+RTMPT, RTMPE, RTMPTE, RTMPS (via librtmp)
+SDP
+MMS over TCP
+
+
+===============
+http://blog.csdn.net/crazyuo/article/details/8599973
+linux ffmpeg 简单视频播放器
+标签： linux ffmpeg 视频播放器
+2013-02-21 19:08 3036人阅读 评论(2) 收藏 举报
+ 分类： linux c 编程（4）  
+版权声明：本文为博主原创文章，未经博主允许不得转载。
+
+1.相信大家在网上看到的关于ffmpeg都已经很多了，这里我就不多介绍了，下面直接晒出代码，和自己关于ffmpeg一些体会
+
+
+
+2.linux ffmpeg的使用步骤
+
+初始化ffmpeg库                      av_register_all()
+
+读取文件的头部，获取基本信息           avformat_open_input()
+
+从头部检查文件的流信息                 avformat_find_stream_info();
+
+获取文件的音，视频,帧率，分辨率，音频等基本信息            av_dump_format()
+
+遍历文件中各个视频流，找到文件中第一个视频流               for(;;)
+
+根据找到的视频流，获取对应的解码器     avcodec_find_decoder()
+
+打开解码器                            avcodec_open2()
+
+分配两个帧指针 pFrame pFrameRGB       pFrame解码器解码出来的帧,pFrameRGB是pFrame转化为RGB的帧
+
+定义一个packet
+
+while()
+
+{
+
+av_read_frame(); //读取一帧，存放到packet中
+
+avcodec_decode_video2();//将packet解码成帧
+
+定义一个AVPICTURE pict
+
+
+******************
+
+sdl一系列操作，添加一个覆盖层，获取覆盖层的数据，布长
+
+       pict.data[0] = bmp->pixels[0];
+
+pict.data[1] = bmp->pixels[2];
+
+pict.data[2] = bmp->pixels[1];
+
+pict.linesize[0] = bmp->pitches[0];
+
+pict.linesize[1] = bmp->pitches[2];
+
+pict.linesize[2] = bmp->pitches[1];
+
+*****************
+
+
+
+sws_getCachedContext();//获取渲染的句柄
+
+sws_scale(pict,...pFrame); //将pFrame 渲染到pict对应的图层中
+
+av_free_packet();//释放帧
+
+}
+
+
+
+3.晒出代码
+
+#include <libavformat/avformat.h>
+#include <libavcodec/avcodec.h>
+#include <libswscale/swscale.h>
+#include <stdio.h>
+#include <SDL/SDL.h>
+#include <SDL/SDL_thread.h>
+
+int main(int argc, char *argv[]) 
+{
+AVFormatContext *pFormatCtx; //输入输出的容器，但不能同时作为输入和输出的容器
+int i, videoStream;
+AVCodecContext *pCodecCtx;   //动态的记录一个解码器的上下文
+AVCodec *pCodec;    //解码器是由链表组成的，链表的类型是AVCodec
+AVFrame *pFrame;    //用来保存数据缓存的对象
+AVFrame *pFrameRGB;
+AVPacket packet;    //主要记录音视频数据帧，时钟信息和压缩数据首地址，大小等信息
+int frameFinished = 0;
+int numBytes;
+uint8_t *buffer;
+struct SwsContext *pSwsCtx;  //视频分辨率，色彩空间变换时所需要的上下文句柄
+
+av_register_all();
+const char *filename = "/home/crazy/桌面/sdl/encoder.264";
+
+//读取文件的头部并且把信息保存到pFormatCtx    检测了文件的头部
+pFormatCtx=avformat_alloc_context();
+if (avformat_open_input(&pFormatCtx, filename, NULL,NULL) != 0)
+return -1; 
+
+//从文件的头部，检查文件中的流的信息
+if (avformat_find_stream_info(pFormatCtx,NULL) < 0)
+return -1; // Couldn't find stream information
+
+
+
+
+//负责为pFormatCtx->streams填上正确的信息,pFormatCtx->streams仅仅是一组大小为pFormatCtx->nb_streams的指针
+av_dump_format(pFormatCtx, 0, filename, 0);
+
+
+// Find the first video stream
+videoStream = -1;
+for (i = 0; i < pFormatCtx->nb_streams; i++)
+if (pFormatCtx->streams[i]->codec->codec_type == AVMEDIA_TYPE_VIDEO) {
+videoStream = i;
+break;
+}
+if (videoStream == -1)
+return -1; // Didn't find a video stream
+
+
+// 得到解码器的上下文信息
+pCodecCtx = pFormatCtx->streams[videoStream]->codec;
+
+
+// Find the decoder for the video stream
+pCodec = avcodec_find_decoder(pCodecCtx->codec_id);
+if (pCodec == NULL) {
+fprintf(stderr, "Unsupported codec!\n");
+return -1; // Codec not found
+}
+// Open codec
+if (avcodec_open2(pCodecCtx, pCodec,NULL) < 0)
+return -1; // Could not open codec
+
+
+// Allocate video frame
+pFrame = avcodec_alloc_frame();
+
+
+// Allocate an AVFrame structure
+pFrameRGB = avcodec_alloc_frame();
+if (pFrameRGB == NULL)
+return -1;
+
+
+// 计算AVCodeContext缓冲区的大小和申请空间
+numBytes = avpicture_get_size(PIX_FMT_RGB24, pCodecCtx->width,
+pCodecCtx->height);
+//申请内存对齐
+buffer = (uint8_t *) av_malloc(numBytes * sizeof(uint8_t));
+
+
+
+//给pFrameRGB 分配内存
+avpicture_fill((AVPicture *) pFrameRGB, buffer, PIX_FMT_RGB24,
+pCodecCtx->width, pCodecCtx->height);
+
+
+
+
+while (av_read_frame(pFormatCtx, &packet) >= 0)
+
+       {
+if (packet.stream_index == videoStream)
+
+               {
+pFrame = avcodec_alloc_frame();
+int w = pCodecCtx->width;
+int h = pCodecCtx->height;
+// Decode video frame
+avcodec_decode_video2(pCodecCtx, pFrame, &frameFinished, &packet);//把包转化为帧
+pSwsCtx = sws_getContext(w, h, pCodecCtx->pix_fmt, w, h,PIX_FMT_RGB565, SWS_POINT, NULL, NULL, NULL); //负责得到视频分辨率，色彩控件变换时的上下文句柄
+if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER)) 
+
+                       {
+fprintf(stderr, "Could not initialize SDL - %s/n",
+SDL_GetError());
+exit(1);
+}
+SDL_Surface *screen;
+screen = SDL_SetVideoMode(pCodecCtx->width, pCodecCtx->height, 0,0);
+if (!screen) 
+
+                       {
+fprintf(stderr, "SDL: could not set video mode - exiting/n");
+exit(1);
+}
+SDL_Overlay *bmp;
+bmp = SDL_CreateYUVOverlay(pCodecCtx->width, pCodecCtx->height,SDL_YV12_OVERLAY, screen);
+SDL_Rect rect;
+if (frameFinished) 
+
+                        {
+SDL_LockYUVOverlay(bmp);
+AVPicture pict;
+pict.data[0] = bmp->pixels[0];
+pict.data[1] = bmp->pixels[2];
+pict.data[2] = bmp->pixels[1];
+pict.linesize[0] = bmp->pitches[0];//pitches是指YUV存储数据对应的stride(步长)
+pict.linesize[1] = bmp->pitches[2];
+pict.linesize[2] = bmp->pitches[1];
+// Convert the image into YUV format that SDL uses
+img_convert(&pict, PIX_FMT_YUV420P, (AVPicture *) pFrame,pCodecCtx->pix_fmt,pCodecCtx->width,pCodecCtx->height);
+SDL_UnlockYUVOverlay(bmp);
+rect.x = 0;
+rect.y = 0;
+rect.w = pCodecCtx->width;
+rect.h = pCodecCtx->height;
+SDL_DisplayYUVOverlay(bmp, &rect);
+}
+SDL_Event event;
+av_free_packet(&packet);
+SDL_PollEvent(&event);
+switch (event.type) {
+case SDL_QUIT:
+SDL_Quit();
+exit(0);
+break;
+default:
+break;
+}
+}
+}
+
+av_free(buffer);
+av_free(pFrameRGB);
+
+
+av_free(pFrame);
+
+
+avcodec_close(pCodecCtx);
+
+
+avformat_close_input(&pFormatCtx);
+
+
+return 0;
+}
+int   img_convert(AVPicture *dst, enum PixelFormat dst_pix_fmt,const AVPicture *src, enum PixelFormat src_pix_fmt, int src_width,int src_height)
+
+ {
+int w;
+int h;
+struct SwsContext *pSwsCtx;
+
+
+w = src_width;
+h = src_height;
+pSwsCtx = sws_getContext(w, h, src_pix_fmt, w, h, dst_pix_fmt, SWS_BICUBIC,
+NULL, NULL, NULL);
+
+
+sws_scale(pSwsCtx, (const uint8_t * const *)src->data, src->linesize, 0, h, dst->data,
+dst->linesize);//把RGB转化为image
+//这样释放掉pSwsCtx的内存
+
+return 0;
+}
+
+
+
+4.makefile编译
+
+a.out:testvideo.c
+
+gcc testvideo.c  -lavformat -lavcodec -lavutil -lswscale -lm -lz  -lSDL -lpthread
+
+
+
+5.关于代码补充
+
+        代码实现的功能还是很简单的，只实现了基本的视频播放，没有实现音频，字幕等，只希望抛砖引玉，如果还有谁能完善代码，希望和我交流；
+
+
+
+同时要提醒大家的是，不同的每个人下载的ffmpeg的库也许是不相同的，所以在编译是会出现很多函数找不到的情况，如果发生了该问题，解决方法如下
+
+比如avformat_open_input()函数找不到
+
+           grep -R avformat_open_input /usr/include  
+
+          在接下来会看到有关api chang 一些的文章，根据api change 提到的改成自己库中支持的函数，我就是自己根据这种方法，改了很多函数，如果有什么特殊情况，可在下面留言！
+
+6.补充
+
+大家转载是希望表明出处，谢谢！
+
+
+
+=================================
+http://ju.outofmemory.cn/entry/50649
+linux ffmpeg 视频截图 安装使用
+Love冥天个人博客-关注IT|PHP|互联网|php个人博客交流 2013-09-27 981 阅读
+linux
+Ubuntu 12.04
+
+在安装ffmpeg之前，首先要安装yasm
+
+1.安装yasm
+
+我用的yasm是yasm-1.2.0.tar.gz这个版本的
+
+#wget http://www.tortall.net/projects/yasm/releases/yasm-1.2.0.tar.gz
+#tar xzvf yasm-1.2.0.tar.gz
+
+# cd yasm-1.2.0
+
+#./configure
+
+注意：不要使用prefix指定安装路径什么的，否则后患无穷啊
+
+#make
+
+#make install
+
+2.安装ffmpeg
+
+我使用的ffmpeg是ffmpeg-0.10.2.tar.bz2 这个版本的
+
+# wget http://ffmpeg.org/releases/ffmpeg-2.0.1.tar.gz
+
+#tar xvfj ffmpeg-2.0.1.tar.gz
+
+#cd ffmpeg-2.0.1
+
+#./configure
+
+#make
+
+#make install
+
+至此，ffmpeg已经安装完成。
+
+测试
+视频截图：
+ffmpeg -i 02c692c38a1c352e4c70cf086cfffa48_1380258978_2168.flv -y -f image2 -ss 8 -frames 1 ./1.jpg
+
+成功
+php调用 视频截图
+
+private function takePicOnVideo($file,$time)
+	{
+		$videoFile='upload/lessions/'.$file;
+		$videoTime=$time;
+		if(is_file($videoFile))
+		{
+			$image_file="$videoFile.jpg";
+			//$command="ffmpeg -i $videoFile -y -f image2 -ss $videoTime -t 0.001 $image_file";
+			$command="ffmpeg -i $videoFile -y -f image2 -ss $videoTime -frames 1 $image_file";
+			set_time_limit(0);
+			exec($command);
+			return $image_file;
+		}
+		else
+		{
+			return '';
+		}
+	}
+附：
+ffmpeg使用语法
+ffmpeg [[options][`-i' input_file]]... {[options] output_file}...
+
+如果没有输入文件，那么视音频捕捉（只在Linux下有效，因为Linux下把音视频设备当作文件句柄来处理）就会起作用。作为通用的规则，选项一 般用于下一个特定的文件。如果你给 –b 64选项，改选会设置下一个视频速率。对于原始输入文件，格式选项可能是需要的。缺省情况下，ffmpeg试图尽可能的无损转换，采用与输入同样的音频视 频参数来输出。
+
+ffmpeg转换所涉及到的选项较多，可参考ffmpeg选项详解。
+
+ffmpeg支持多种文件格式和多种音频、视频编码器，可参考ffmepg格式详解，（附：常见视频文件格式详解）
+
+视频文件截图
+截取一张352x240尺寸大小的，格式为jpg的图片
+ffmpeg -i test.asf -y -f image2 -t 0.001 -s 352x240 a.jpg
+
+把视频的前３０帧转换成一个Animated Gif
+ffmpeg -i test.asf -vframes 30 -y -f gif a.gif
+
+截取指定时间的缩微图
+ffmpeg -i test.avi -y -f image2 -ss 8 -t 0.001 -s 350x240 test.jpg
+
+-ss后跟的时间单位为秒
+转换文件为3GP格式
+ffmpeg -y -i test.mpeg -bitexact -vcodec h263 -b 128 -r 15 -s 176x144
+
+-acodec aac -ac 2 -ar 22500 -ab 24 -f 3gp test.3gp
+
+或
+ffmpeg -y -i test.wmv -ac 1 -acodec libamr_nb -ar 8000 -ab 12200 -s 176x144 -b 128 -r 15 test.3gp
+
+视频格式转换
+如何使用 ffmpeg 编码得到高质量的视频
+ffmpeg.exe -i "D:\Video\Fearless\Fearless.avi" -target film-dvd -s 720x352
+
+-padtop 64 -padbottom 64 -maxrate 7350000 -b 3700000 -sc_threshold 1000000000
+
+-trellis -cgop -g 12 -bf 2 -qblur 0.3 -qcomp 0.7 -me full -dc 10 -mbd 2
+
+-aspect 16:9 -pass 2 -passlogfile "D:\Video\ffmpegencode" -an -f mpeg2video "D:\Fearless.m2v"
+
+转换指定格式文件到FLV格式
+ffmpeg.exe -i test.mp3 -ab 56 -ar 22050 -b 500 -r 15 -s 320x240 f:\test.flv
+
+ffmpeg.exe -i test.wmv -ab 56 -ar 22050 -b 500 -r 15 -s 320x240 f:\test.flv
+
+转码解密的VOB
+ffmpeg -i snatch_1.vob -f avi -vcodec mpeg4 -b 800 -g 300 -bf 2 -acodec mp3 -ab 128 snatch.avi
+
+上面的命令行将vob的文件转化成avi文件，mpeg4的视频和mp3的音频。注意命令中使用了B帧，所以mpeg4流是divx5兼容的。GOP大小是300意味着29.97帧频下每10秒就有INTRA帧。该映射在音频语言的DVD转码时候尤其有用。
+同时编码到几种格式并且在输入流和输出流之间建立映射
+ffmpeg -i /tmp/a.wav -ab 64 /tmp/a.mp2 -ab 128 /tmp/b.mp2 -map 0:0 -map 0:0
+
+上面的命令行转换一个64Kbits 的a.wav到128kbits的a.mp2 ‘-map file:index’在输出流的顺序上定义了哪一路输入流是用于每一个输出流的。
+转换文件为3GP格式
+ffmpeg -i test.avi -y -b 20 -s sqcif -r 10 -acodec amr_wb -ab 23.85 -ac 1 -ar 16000 test.3gp
+
+注：如果要转换为3GP格式，则ffmpeg在编译时必须加上–enable-amr_nb –enable-amr_wb，详细内容可参考：转换视频为3GPP格式
+转换文件为MP4格式（支持iPhone/iTouch）
+ffmpeg -y -i input.wmv -f mp4 -async 1-s 480x320 -acodec libfaac -vcodec libxvid -qscale 7 -dts_delta_threshold 1 output.mp4
+
+ffmpeg -y -i source_video.avi input -acodec libfaac -ab 128000 -vcodec mpeg4 -b 1200000 -mbd 2 -flags +4mv+trell -aic 2 -cmp 2 -subcmp 2 -s 320x180 -title X final_video.mp4
+
+将一段音频与一段视频混合
+ffmpeg -i son.wav -i video_origine.avi video_finale.mpg
+
+将一段视频转换为DVD格式
+ffmpeg -i source_video.avi -target pal-dvd -ps 2000000000 -aspect 16:9 finale_video.mpeg
+
+注：target pal-dvd : Output format ps 2000000000 maximum size for the output file, in bits (here, 2 Gb) aspect 16:9 : Widescreen
+转换一段视频为DivX格式
+ffmpeg -i video_origine.avi -s 320x240 -vcodec msmpeg4v2 video_finale.avi
+
+Turn X images to a video sequence
+ffmpeg -f image2 -i image%d.jpg video.mpg
+
+注：This command will transform all the images from the current directory (named image1.jpg, image2.jpg, etc...) to a video file named video.mpg.
+Turn a video to X images
+ffmpeg -i video.mpg image%d.jpg
+
+注：This command will generate the files named image1.jpg, image2.jpg, ...
+The following image formats are also availables : PGM, PPM, PAM, PGMYUV, JPEG, GIF, PNG, TIFF, SGI.
+屏幕录制
+使用ffmpeg录像屏幕
+ffmpeg -vcodec mpeg4 -b 1000 -r 10 -g 300 -vd x11:0,0 -s 1024x768 ~/test.avi
+
+：其中，-vd x11:0,0 指录制所使用的偏移为 x=0 和 y=0，-s 1024×768 指录制视频的大小为 1024×768。录制的视频文件为 test.avi，将保存到用户主目录中
+
+如果你只想录制一个应用程序窗口或者桌面上的一个固定区域，那么可以指定偏移位置和区域大小。使用xwininfo -frame命令可以完成查找上述参数。
+重新调整视频尺寸大小
+ffmpeg -vcodec mpeg4 -b 1000 -r 10 -g 300 -i ~/test.avi -s 800×600 ~/test-800-600.avi
+
+注：ffmpeg的屏幕录制功能只能在Linux环境下有效。
+视频采集
+把摄像头的实时视频录制下来，存储为文件
+ffmpeg -f video4linux -s 320*240 -r 10 -i /dev/video0 test.asf
+
+更多信息可参考ffmpeg工程组论坛的讨论贴：有关ffmpeg的视频采集
+注：ffmpeg的视频采集功能只能在Linux环境下使用
+使用ffmpeg压制H.264视频
+ffmpeg -threads 4 -i INPUT -r 29.97 -vcodec libx264 -s 480x272 -flags +loop -cmp +chroma -deblockalpha 0 -deblockbeta 0 -crf 24
+
+-bt 256k -refs 1 -coder 0 -me umh -me_range 16 -subq 5 -partitions +parti4x4+parti8x8+partp8x8 -g 250 -keyint_min 25 -level 30
+
+-qmin 10 -qmax 51 -trellis 2 -sc_threshold 40 -i_qfactor 0.71 -acodec libfaac -ab 128k -ar 48000 -ac 2 OUTPUT
+
+注：使用该指令可以压缩出比较清晰，而且文件转小的H.264视频文件

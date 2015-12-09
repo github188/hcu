@@ -1,0 +1,449 @@
+DBG : T: 12/08/15 00:37:28:689: rc/comvm/vmlayer.c: 34  : HCU-VM: Application Layer start and initialized! Build: Dec  7 2015, 08:22:32
+DBG : T: 12/08/15 00:37:28:690: rc/comvm/vmlayer.c: 35  : HCU-VM: Current Hardware Type = 2, Hardware Module = 1
+DBG : T: 12/08/15 00:37:28:690: rc/comvm/vmlayer.c: 36  : HCU-VM: Current Software Release = 1, Software Delivery = 26
+DBG : T: 12/08/15 00:37:28:690: rc/comvm/vmlayer.c: 41  : HCU-VM: Hardware MAC Address = 00 00 00 00 00 00
+DBG : T: 12/08/15 00:37:28:690: rc/comvm/vmlayer.c: 699 : HCU-VM: >>Start init FSM.
+DBG : T: 12/08/15 00:37:28:691: ../src/hcu.c      : 50  : HCU-MAIN: System level initialization starting...
+DBG : T: 12/08/15 00:37:28:691: ../src/hcu.c      : 320 : HCU-MAIN: Staring to create task [HCUMAIN] related environments...
+DBG : T: 12/08/15 00:37:28:691: ../src/hcu.c      : 325 : HCU-MAIN: create queue zHcuTaskNameList[HCUMAIN] successfully.
+DBG : T: 12/08/15 00:37:28:691: ../src/hcu.c      : 410 : HCU-MAIN: Staring to create task [TIMER] related environments...
+DBG : T: 12/08/15 00:37:28:692: rc/comvm/vmlayer.c: 141 : HCU-VM: pthread_create() OK ...
+DBG : T: 12/08/15 00:37:28:692: ../src/hcu.c      : 410 : HCU-MAIN: Staring to create task [MMC] related environments...
+DBG : T: 12/08/15 00:37:28:692: rc/comvm/vmlayer.c: 141 : HCU-VM: pthread_create() OK ...
+DBG : T: 12/08/15 00:37:28:692: ../src/hcu.c      : 410 : HCU-MAIN: Staring to create task [HWINV] related environments...
+DBG : T: 12/08/15 00:37:28:693: rc/comvm/vmlayer.c: 141 : HCU-VM: pthread_create() OK ...
+DBG : T: 12/08/15 00:37:28:693: ../src/hcu.c      : 410 : HCU-MAIN: Staring to create task [SVRCON] related environments...
+DBG : T: 12/08/15 00:37:28:693: rc/comvm/vmlayer.c: 141 : HCU-VM: pthread_create() OK ...
+DBG : T: 12/08/15 00:37:28:693: ../src/hcu.c      : 410 : HCU-MAIN: Staring to create task [CLOUD] related environments...
+DBG : T: 12/08/15 00:37:28:694: rc/comvm/vmlayer.c: 141 : HCU-VM: pthread_create() OK ...
+DBG : T: 12/08/15 00:37:28:694: ../src/hcu.c      : 410 : HCU-MAIN: Staring to create task [MODBUS] related environments...
+DBG : T: 12/08/15 00:37:28:694: rc/comvm/vmlayer.c: 141 : HCU-VM: pthread_create() OK ...
+DBG : T: 12/08/15 00:37:28:694: ../src/hcu.c      : 410 : HCU-MAIN: Staring to create task [EMC] related environments...
+DBG : T: 12/08/15 00:37:28:694: rc/comvm/vmlayer.c: 141 : HCU-VM: pthread_create() OK ...
+DBG : T: 12/08/15 00:37:28:695: ../src/hcu.c      : 410 : HCU-MAIN: Staring to create task [PM25] related environments...
+DBG : T: 12/08/15 00:37:28:695: rc/comvm/vmlayer.c: 141 : HCU-VM: pthread_create() OK ...
+DBG : T: 12/08/15 00:37:28:695: ../src/hcu.c      : 410 : HCU-MAIN: Staring to create task [WINDDIR] related environments...
+DBG : T: 12/08/15 00:37:28:695: rc/comvm/vmlayer.c: 141 : HCU-VM: pthread_create() OK ...
+DBG : T: 12/08/15 00:37:28:695: ../src/hcu.c      : 410 : HCU-MAIN: Staring to create task [WINDSPD] related environments...
+DBG : T: 12/08/15 00:37:28:696: rc/comvm/vmlayer.c: 141 : HCU-VM: pthread_create() OK ...
+DBG : T: 12/08/15 00:37:28:696: ../src/hcu.c      : 410 : HCU-MAIN: Staring to create task [TEMP] related environments...
+DBG : T: 12/08/15 00:37:28:696: rc/comvm/vmlayer.c: 141 : HCU-VM: pthread_create() OK ...
+DBG : T: 12/08/15 00:37:28:696: ../src/hcu.c      : 410 : HCU-MAIN: Staring to create task [HUMID] related environments...
+DBG : T: 12/08/15 00:37:28:697: rc/comvm/vmlayer.c: 141 : HCU-VM: pthread_create() OK ...
+DBG : T: 12/08/15 00:37:28:697: ../src/hcu.c      : 410 : HCU-MAIN: Staring to create task [HSMMP] related environments...
+DBG : T: 12/08/15 00:37:28:697: rc/comvm/vmlayer.c: 141 : HCU-VM: pthread_create() OK ...
+DBG : T: 12/08/15 00:37:28:697: ../src/hcu.c      : 410 : HCU-MAIN: Staring to create task [ETHERNET] related environments...
+DBG : T: 12/08/15 00:37:28:697: rc/comvm/vmlayer.c: 141 : HCU-VM: pthread_create() OK ...
+DBG : T: 12/08/15 00:37:28:697: ../src/hcu.c      : 410 : HCU-MAIN: Staring to create task [WIFI] related environments...
+DBG : T: 12/08/15 00:37:28:698: rc/comvm/vmlayer.c: 141 : HCU-VM: pthread_create() OK ...
+DBG : T: 12/08/15 00:37:28:698: ../src/hcu.c      : 410 : HCU-MAIN: Staring to create task [USBNET] related environments...
+DBG : T: 12/08/15 00:37:28:698: rc/comvm/vmlayer.c: 141 : HCU-VM: pthread_create() OK ...
+DBG : T: 12/08/15 00:37:28:698: ../src/hcu.c      : 410 : HCU-MAIN: Staring to create task [3G4G] related environments...
+DBG : T: 12/08/15 00:37:28:699: rc/comvm/vmlayer.c: 141 : HCU-VM: pthread_create() OK ...
+DBG : T: 12/08/15 00:37:28:699: ../src/hcu.c      : 410 : HCU-MAIN: Staring to create task [SPS232] related environments...
+DBG : T: 12/08/15 00:37:28:699: rc/comvm/vmlayer.c: 141 : HCU-VM: pthread_create() OK ...
+DBG : T: 12/08/15 00:37:28:699: ../src/hcu.c      : 410 : HCU-MAIN: Staring to create task [SPS485] related environments...
+DBG : T: 12/08/15 00:37:28:699: rc/comvm/vmlayer.c: 141 : HCU-VM: pthread_create() OK ...
+DBG : T: 12/08/15 00:37:28:700: ../src/hcu.c      : 410 : HCU-MAIN: Staring to create task [BLE] related environments...
+DBG : T: 12/08/15 00:37:28:700: rc/comvm/vmlayer.c: 141 : HCU-VM: pthread_create() OK ...
+DBG : T: 12/08/15 00:37:28:700: ../src/hcu.c      : 410 : HCU-MAIN: Staring to create task [AUDIO] related environments...
+DBG : T: 12/08/15 00:37:28:700: rc/comvm/vmlayer.c: 141 : HCU-VM: pthread_create() OK ...
+DBG : T: 12/08/15 00:37:28:700: ../src/hcu.c      : 410 : HCU-MAIN: Staring to create task [CAMERA] related environments...
+DBG : T: 12/08/15 00:37:28:701: rc/comvm/vmlayer.c: 141 : HCU-VM: pthread_create() OK ...
+DBG : T: 12/08/15 00:37:28:701: ../src/hcu.c      : 410 : HCU-MAIN: Staring to create task [GPS] related environments...
+DBG : T: 12/08/15 00:37:28:701: rc/comvm/vmlayer.c: 141 : HCU-VM: pthread_create() OK ...
+DBG : T: 12/08/15 00:37:28:701: ../src/hcu.c      : 410 : HCU-MAIN: Staring to create task [LCD] related environments...
+DBG : T: 12/08/15 00:37:28:701: rc/comvm/vmlayer.c: 141 : HCU-VM: pthread_create() OK ...
+DBG : T: 12/08/15 00:37:28:702: ../src/hcu.c      : 57  : HCU-MAIN: Create all task successful, congratulation!
+DBG : T: 12/08/15 00:37:28:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=02[MSG_ID_COM_INIT_FB],DID=01[HCUMAIN],SID=05[TIMER],LEN=4
+DBG : T: 12/08/15 00:37:28:703: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=01[MSG_ID_COM_INIT],DID=05[TIMER],SID=01[HCUMAIN],LEN=4
+DBG : T: 12/08/15 00:37:28:703: ../src/hcu.c      : 84  : HCU-MAIN: TIMER task init completed. 
+DBG : T: 12/08/15 00:37:28:703: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=02[MSG_ID_COM_INIT_FB],DID=01[HCUMAIN],SID=20[SVRCON],LEN=4
+DBG : T: 12/08/15 00:37:28:703: src/l3app/svrcon.c: 98  : SVRCON: Staring to init all task by distribute MSG_ID_COM_INIT message!
+DBG : T: 12/08/15 00:37:28:703: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=01[MSG_ID_COM_INIT],DID=06[MMC],SID=20[SVRCON],LEN=4
+DBG : T: 12/08/15 00:37:28:703: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=01[MSG_ID_COM_INIT],DID=16[HWINV],SID=20[SVRCON],LEN=4
+DBG : T: 12/08/15 00:37:28:703: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=01[MSG_ID_COM_INIT],DID=18[MODBUS],SID=20[SVRCON],LEN=4
+DBG : T: 12/08/15 00:37:28:703: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=01[MSG_ID_COM_INIT],DID=17[CLOUD],SID=20[SVRCON],LEN=4
+DBG : T: 12/08/15 00:37:28:703: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=01[MSG_ID_COM_INIT],DID=1A[EMC],SID=20[SVRCON],LEN=4
+DBG : T: 12/08/15 00:37:28:703: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=01[MSG_ID_COM_INIT],DID=1C[PM25],SID=20[SVRCON],LEN=4
+DBG : T: 12/08/15 00:37:28:703: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=01[MSG_ID_COM_INIT],DID=1D[TEMP],SID=20[SVRCON],LEN=4
+DBG : T: 12/08/15 00:37:28:703: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=01[MSG_ID_COM_INIT],DID=1B[HUMID],SID=20[SVRCON],LEN=4
+DBG : T: 12/08/15 00:37:28:703: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=01[MSG_ID_COM_INIT],DID=1E[WINDDIR],SID=20[SVRCON],LEN=4
+DBG : T: 12/08/15 00:37:28:703: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=01[MSG_ID_COM_INIT],DID=1F[WINDSPD],SID=20[SVRCON],LEN=4
+DBG : T: 12/08/15 00:37:28:704: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=01[MSG_ID_COM_INIT],DID=19[HSMMP],SID=20[SVRCON],LEN=4
+DBG : T: 12/08/15 00:37:28:704: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=01[MSG_ID_COM_INIT],DID=0C[ETHERNET],SID=20[SVRCON],LEN=4
+DBG : T: 12/08/15 00:37:28:704: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=01[MSG_ID_COM_INIT],DID=0D[WIFI],SID=20[SVRCON],LEN=4
+DBG : T: 12/08/15 00:37:28:704: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=01[MSG_ID_COM_INIT],DID=0E[USBNET],SID=20[SVRCON],LEN=4
+DBG : T: 12/08/15 00:37:28:704: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=01[MSG_ID_COM_INIT],DID=0F[3G4G],SID=20[SVRCON],LEN=4
+DBG : T: 12/08/15 00:37:28:704: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=01[MSG_ID_COM_INIT],DID=09[SPS232],SID=20[SVRCON],LEN=4
+DBG : T: 12/08/15 00:37:28:704: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=01[MSG_ID_COM_INIT],DID=0A[SPS485],SID=20[SVRCON],LEN=4
+DBG : T: 12/08/15 00:37:28:704: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=01[MSG_ID_COM_INIT],DID=12[AUDIO],SID=20[SVRCON],LEN=4
+DBG : T: 12/08/15 00:37:28:704: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=01[MSG_ID_COM_INIT],DID=11[CAMERA],SID=20[SVRCON],LEN=4
+DBG : T: 12/08/15 00:37:28:704: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=01[MSG_ID_COM_INIT],DID=0B[BLE],SID=20[SVRCON],LEN=4
+DBG : T: 12/08/15 00:37:28:704: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=01[MSG_ID_COM_INIT],DID=14[GPS],SID=20[SVRCON],LEN=4
+DBG : T: 12/08/15 00:37:28:704: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=01[MSG_ID_COM_INIT],DID=15[LCD],SID=20[SVRCON],LEN=4
+DBG : T: 12/08/15 00:37:28:704: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=02[MSG_ID_COM_INIT_FB],DID=20[SVRCON],SID=06[MMC],LEN=4
+DBG : T: 12/08/15 00:37:28:704: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=02[MSG_ID_COM_INIT_FB],DID=20[SVRCON],SID=16[HWINV],LEN=4
+DBG : T: 12/08/15 00:37:28:705: rc/l2frame/hwinv.c: 256 : ********************************************************************
+DBG : T: 12/08/15 00:37:28:705: rc/l2frame/hwinv.c: 257 : ********************************************************************
+DBG : T: 12/08/15 00:37:28:705: rc/l2frame/hwinv.c: 258 : **                                                                **
+DBG : T: 12/08/15 00:37:28:705: rc/l2frame/hwinv.c: 259 : **              Home and Car Unisystem (HCU)                      **
+DBG : T: 12/08/15 00:37:28:705: rc/l2frame/hwinv.c: 260 : **            Octopus Wireless Communications Co. Ltd.            **
+DBG : T: 12/08/15 00:37:28:705: rc/l2frame/hwinv.c: 261 : **                          Version 1.0                           **
+DBG : T: 12/08/15 00:37:28:705: rc/l2frame/hwinv.c: 262 : **                                                                **
+DBG : T: 12/08/15 00:37:28:705: rc/l2frame/hwinv.c: 263 : ********************************************************************
+DBG : T: 12/08/15 00:37:28:705: rc/l2frame/hwinv.c: 264 : ********************************************************************
+DBG : T: 12/08/15 00:37:28:705: rc/l2frame/hwinv.c: 265 :  
+DBG : T: 12/08/15 00:37:28:705: rc/l2frame/hwinv.c: 266 : SW Build: Dec  7 2015, 08:22:29
+DBG : T: 12/08/15 00:37:28:705: rc/l2frame/hwinv.c: 267 : HW Build: P01
+DBG : T: 12/08/15 00:37:28:705: rc/l2frame/hwinv.c: 268 :  == SYSINFO ==
+DBG : T: 12/08/15 00:37:28:705: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=13[MSG_ID_HWINV_CLOUD_PHY_STATUS_CHG],DID=17[CLOUD],SID=16[HWINV],LEN=8
+DBG : T: 12/08/15 00:37:28:705: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=13[MSG_ID_HWINV_CLOUD_PHY_STATUS_CHG],DID=17[CLOUD],SID=16[HWINV],LEN=8
+DBG : T: 12/08/15 00:37:28:705: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=13[MSG_ID_HWINV_CLOUD_PHY_STATUS_CHG],DID=17[CLOUD],SID=16[HWINV],LEN=8
+DBG : T: 12/08/15 00:37:28:705: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=02[MSG_ID_COM_INIT_FB],DID=20[SVRCON],SID=18[MODBUS],LEN=4
+DBG : T: 12/08/15 00:37:28:706: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=02[MSG_ID_COM_INIT_FB],DID=20[SVRCON],SID=17[CLOUD],LEN=4
+DBG : T: 12/08/15 00:37:28:708: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=02[MSG_ID_COM_INIT_FB],DID=20[SVRCON],SID=1A[EMC],LEN=4
+DBG : T: 12/08/15 00:37:28:709: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=02[MSG_ID_COM_INIT_FB],DID=20[SVRCON],SID=1C[PM25],LEN=4
+DBG : T: 12/08/15 00:37:28:709: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=02[MSG_ID_COM_INIT_FB],DID=20[SVRCON],SID=1D[TEMP],LEN=4
+DBG : T: 12/08/15 00:37:28:709: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=02[MSG_ID_COM_INIT_FB],DID=20[SVRCON],SID=1B[HUMID],LEN=4
+DBG : T: 12/08/15 00:37:28:709: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=02[MSG_ID_COM_INIT_FB],DID=20[SVRCON],SID=1E[WINDDIR],LEN=4
+DBG : T: 12/08/15 00:37:28:709: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=02[MSG_ID_COM_INIT_FB],DID=20[SVRCON],SID=1F[WINDSPD],LEN=4
+DBG : T: 12/08/15 00:37:28:709: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=02[MSG_ID_COM_INIT_FB],DID=20[SVRCON],SID=19[HSMMP],LEN=4
+DBG : T: 12/08/15 00:37:28:709: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=02[MSG_ID_COM_INIT_FB],DID=20[SVRCON],SID=0C[ETHERNET],LEN=4
+DBG : T: 12/08/15 00:37:28:709: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=02[MSG_ID_COM_INIT_FB],DID=20[SVRCON],SID=0D[WIFI],LEN=4
+DBG : T: 12/08/15 00:37:28:710: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=02[MSG_ID_COM_INIT_FB],DID=20[SVRCON],SID=0E[USBNET],LEN=4
+DBG : T: 12/08/15 00:37:28:710: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=02[MSG_ID_COM_INIT_FB],DID=20[SVRCON],SID=0F[3G4G],LEN=4
+DBG : T: 12/08/15 00:37:28:710: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=02[MSG_ID_COM_INIT_FB],DID=20[SVRCON],SID=09[SPS232],LEN=4
+DBG : T: 12/08/15 00:37:28:710: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=02[MSG_ID_COM_INIT_FB],DID=20[SVRCON],SID=0A[SPS485],LEN=4
+DBG : T: 12/08/15 00:37:28:710: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=02[MSG_ID_COM_INIT_FB],DID=20[SVRCON],SID=12[AUDIO],LEN=4
+DBG : T: 12/08/15 00:37:28:710: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=02[MSG_ID_COM_INIT_FB],DID=20[SVRCON],SID=11[CAMERA],LEN=4
+DBG : T: 12/08/15 00:37:28:710: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=02[MSG_ID_COM_INIT_FB],DID=20[SVRCON],SID=0B[BLE],LEN=4
+DBG : T: 12/08/15 00:37:28:710: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=02[MSG_ID_COM_INIT_FB],DID=20[SVRCON],SID=14[GPS],LEN=4
+DBG : T: 12/08/15 00:37:28:711: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=02[MSG_ID_COM_INIT_FB],DID=20[SVRCON],SID=15[LCD],LEN=4
+DBG : T: 12/08/15 00:37:28:711: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=01[MSG_ID_COM_INIT],DID=20[SVRCON],SID=01[HCUMAIN],LEN=4
+DBG : T: 12/08/15 00:37:28:711: ../src/hcu.c      : 116 : HCU-MAIN: HCU-MAIN task init completed, enter into SLEEP mode forever! 
+DBG : T: 12/08/15 00:37:29:179: c/l2frame/camera.c: 284 : CAMER:A Support format: pixelformat = ''YUYV''
+description = ''YUV 4:2:2 (YUYV)'', flag=0
+DBG : T: 12/08/15 00:37:29:179: c/l2frame/camera.c: 284 : CAMER:A Support format: pixelformat = ''MJPG''
+description = ''MJPEG'', flag=1
+DBG : T: 12/08/15 00:37:29:179: c/l2frame/camera.c: 295 : CAMERA: Driver Name=uvcvideo, Card Name=UVC Camera (046d:0825), Bus info=usb-musb-hdrc.1-1.1, Driver Version=3.2.0
+DBG : T: 12/08/15 00:37:29:202: c/l2frame/camera.c: 369 : Current data format information:
+	width:640
+	height:480
+DBG : T: 12/08/15 00:37:29:202: c/l2frame/camera.c: 380 : CAMERA: 	format:YUV 4:2:2 (YUYV)
+DBG : T: 12/08/15 00:37:29:202: c/l2frame/camera.c: 392 : CAMERA: Not support format RGB32!
+DBG : T: 12/08/15 00:37:29:202: c/l2frame/camera.c: 457 : CAMERA: Current input Camera 1 supports:
+DBG : T: 12/08/15 00:37:29:202: c/l2frame/camera.c: 473 : CAMERA: VIDIOC_ENUMSTD error!
+DBG : T: 12/08/15 00:37:29:202: c/l2frame/camera.c: 115 : CAMERA: Check input/output error!
+DBG : T: 12/08/15 00:37:29:202: rc/comvm/vmlayer.c: 1006: HCU-VM: Internal error is found in the state function.
+DBG : T: 12/08/15 00:37:29:202: rc/comvm/vmlayer.c: 918 : HCU-VM: Error execute FsmRun state machine!
+DBG : T: 12/08/15 00:37:37:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=1A[MSG_ID_EMC_MODBUS_DATA_READ],DID=18[MODBUS],SID=1A[EMC],LEN=12
+DBG : T: 12/08/15 00:37:37:702: c/l2frame/modbus.c: 144 : MODBUS: Preparing send modbus EMC req data = 05 03 00 04 00 01 C4 4F
+DBG : T: 12/08/15 00:37:37:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=26[MSG_ID_MODBUS_EMC_DATA_REPORT],DID=1A[EMC],SID=18[MODBUS],LEN=32
+DBG : T: 12/08/15 00:37:37:703: 2frame/cloudcont.c: 875 : CLOUD: Data record save to MEM-DISC, sid=1, totalNbr=1, offNbr=1
+DBG : T: 12/08/15 00:37:40:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=1C[MSG_ID_PM25_MODBUS_DATA_READ],DID=18[MODBUS],SID=1C[PM25],LEN=12
+DBG : T: 12/08/15 00:37:40:702: c/l2frame/modbus.c: 270 : MODBUS: Preparing send modbus PM25 req data = 01 03 00 04 00 06 84 09
+DBG : T: 12/08/15 00:37:40:702: c/l2frame/sps485.c: 425 : SPS485: InitSerialPort Start ...
+DBG : T: 12/08/15 00:37:40:703: c/l2frame/sps485.c: 229 : SPS485: COM 2 has been openned
+DBG : T: 12/08/15 00:37:40:703: c/l2frame/sps485.c: 433 : SPS485: InitSerialPort serial port COM2 open successfully.
+DBG : T: 12/08/15 00:37:40:703: c/l2frame/sps485.c: 364 : SPS485: COM port flags: c_cflag = 0x8BD, c_iflag = 0x0, c_oflag = 0x0, c_lflag = 0x0, VTIME = 0x0, TMIN = 0x1
+DBG : T: 12/08/15 00:37:40:703: c/l2frame/sps485.c: 366 : SPS485: COM port set done!
+DBG : T: 12/08/15 00:37:40:703: c/l2frame/sps485.c: 441 : SPS485: InitSerialPort serial port COM2 properties has been set successfully.
+DBG : T: 12/08/15 00:37:40:703: c/l2frame/sps485.c: 444 : SPS485: InitSerialPort completed.
+DBG : T: 12/08/15 00:37:40:703: c/l2frame/modbus.c: 281 : MODBUS: Init Serial Port Success ...
+DBG : T: 12/08/15 00:37:40:703: c/l2frame/modbus.c: 285 : MODBUS: COM port flags: VTIME = 0x0, TMIN = 0x17
+DBG : T: 12/08/15 00:37:40:703: c/l2frame/modbus.c: 296 : MODBUS: Send PM25 data succeed: 01 03 00 04 00 06 84 09
+DBG : T: 12/08/15 00:37:40:704: 2frame/cloudcont.c: 177 : CLOUD: Connect state change, from OFFLINE to ONLINE!
+DBG : T: 12/08/15 00:37:40:785: c/l2frame/modbus.c: 306 : MODBUS: Len 17  
+DBG : T: 12/08/15 00:37:40:786: c/l2frame/modbus.c: 307 : MODBUS: Received PM2.5 data succeed: 01 03 0C 00 00 00 00 00 00 00 00 00 65 00 00 83 6F
+DBG : T: 12/08/15 00:37:40:786: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=27[MSG_ID_MODBUS_PM25_DATA_REPORT],DID=1C[PM25],SID=18[MODBUS],LEN=40
+DBG : T: 12/08/15 00:37:40:786: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=1D[MSG_ID_PM25_CLOUD_DATA_RESP],DID=17[CLOUD],SID=1C[PM25],LEN=40
+DBG : T: 12/08/15 00:37:40:786: 2frame/cloudcont.c: 875 : CLOUD: Data record save to MEM-DISC, sid=2, totalNbr=2, offNbr=1
+DBG : T: 12/08/15 00:37:40:786: 2frame/cloudcont.c: 995 : CLOUD: Send data len=310, String= [<xml><ToUserName><![CDATA[SAE_MFUNHCU]]></ToUserName><FromUserName><![CDATA[HCU_SH_0301]]></FromUserName><CreateTime>201511080037</CreateTime><MsgType><![CDATA[DEV_REPORT]]></MsgType><Content><![CDATA[25000101000000000000000000000065000001BC0000022B0000029A5665B5D4]]></Content><FuncFlag>0</FuncFlag></xml>]
+DBG : T: 12/08/15 00:37:43:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=1A[MSG_ID_EMC_MODBUS_DATA_READ],DID=18[MODBUS],SID=1A[EMC],LEN=12
+DBG : T: 12/08/15 00:37:43:702: c/l2frame/modbus.c: 144 : MODBUS: Preparing send modbus EMC req data = 05 03 00 04 00 01 C4 4F
+DBG : T: 12/08/15 00:37:43:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=26[MSG_ID_MODBUS_EMC_DATA_REPORT],DID=1A[EMC],SID=18[MODBUS],LEN=32
+DBG : T: 12/08/15 00:37:43:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=1B[MSG_ID_EMC_MODBUS_DATA_READ],DID=17[CLOUD],SID=1A[EMC],LEN=32
+DBG : T: 12/08/15 00:37:43:703: 2frame/cloudcont.c: 875 : CLOUD: Data record save to MEM-DISC, sid=3, totalNbr=3, offNbr=1
+DBG : T: 12/08/15 00:37:46:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=1C[MSG_ID_PM25_MODBUS_DATA_READ],DID=18[MODBUS],SID=1C[PM25],LEN=12
+DBG : T: 12/08/15 00:37:46:702: c/l2frame/modbus.c: 270 : MODBUS: Preparing send modbus PM25 req data = 01 03 00 04 00 06 84 09
+DBG : T: 12/08/15 00:37:46:702: c/l2frame/sps485.c: 425 : SPS485: InitSerialPort Start ...
+DBG : T: 12/08/15 00:37:46:703: c/l2frame/sps485.c: 229 : SPS485: COM 2 has been openned
+DBG : T: 12/08/15 00:37:46:703: c/l2frame/sps485.c: 433 : SPS485: InitSerialPort serial port COM2 open successfully.
+DBG : T: 12/08/15 00:37:46:703: c/l2frame/sps485.c: 364 : SPS485: COM port flags: c_cflag = 0x8BD, c_iflag = 0x0, c_oflag = 0x0, c_lflag = 0x0, VTIME = 0x0, TMIN = 0x1
+DBG : T: 12/08/15 00:37:46:703: c/l2frame/sps485.c: 366 : SPS485: COM port set done!
+DBG : T: 12/08/15 00:37:46:703: c/l2frame/sps485.c: 441 : SPS485: InitSerialPort serial port COM2 properties has been set successfully.
+DBG : T: 12/08/15 00:37:46:703: c/l2frame/sps485.c: 444 : SPS485: InitSerialPort completed.
+DBG : T: 12/08/15 00:37:46:703: c/l2frame/modbus.c: 281 : MODBUS: Init Serial Port Success ...
+DBG : T: 12/08/15 00:37:46:703: c/l2frame/modbus.c: 285 : MODBUS: COM port flags: VTIME = 0x0, TMIN = 0x17
+DBG : T: 12/08/15 00:37:46:703: c/l2frame/modbus.c: 296 : MODBUS: Send PM25 data succeed: 01 03 00 04 00 06 84 09
+DBG : T: 12/08/15 00:37:46:785: c/l2frame/modbus.c: 306 : MODBUS: Len 17  
+DBG : T: 12/08/15 00:37:46:785: c/l2frame/modbus.c: 307 : MODBUS: Received PM2.5 data succeed: 01 03 0C 00 00 00 00 00 00 00 00 00 65 00 00 83 6F
+DBG : T: 12/08/15 00:37:46:785: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=27[MSG_ID_MODBUS_PM25_DATA_REPORT],DID=1C[PM25],SID=18[MODBUS],LEN=40
+DBG : T: 12/08/15 00:37:46:785: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=1D[MSG_ID_PM25_CLOUD_DATA_RESP],DID=17[CLOUD],SID=1C[PM25],LEN=40
+DBG : T: 12/08/15 00:37:46:785: 2frame/cloudcont.c: 875 : CLOUD: Data record save to MEM-DISC, sid=4, totalNbr=4, offNbr=1
+DBG : T: 12/08/15 00:37:49:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=1A[MSG_ID_EMC_MODBUS_DATA_READ],DID=18[MODBUS],SID=1A[EMC],LEN=12
+DBG : T: 12/08/15 00:37:49:702: c/l2frame/modbus.c: 144 : MODBUS: Preparing send modbus EMC req data = 05 03 00 04 00 01 C4 4F
+DBG : T: 12/08/15 00:37:49:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=26[MSG_ID_MODBUS_EMC_DATA_REPORT],DID=1A[EMC],SID=18[MODBUS],LEN=32
+DBG : T: 12/08/15 00:37:49:703: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=1B[MSG_ID_EMC_MODBUS_DATA_READ],DID=17[CLOUD],SID=1A[EMC],LEN=32
+DBG : T: 12/08/15 00:37:49:703: 2frame/cloudcont.c: 875 : CLOUD: Data record save to MEM-DISC, sid=5, totalNbr=5, offNbr=1
+DBG : T: 12/08/15 00:37:52:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=1C[MSG_ID_PM25_MODBUS_DATA_READ],DID=18[MODBUS],SID=1C[PM25],LEN=12
+DBG : T: 12/08/15 00:37:52:702: c/l2frame/modbus.c: 270 : MODBUS: Preparing send modbus PM25 req data = 01 03 00 04 00 06 84 09
+DBG : T: 12/08/15 00:37:52:702: c/l2frame/sps485.c: 425 : SPS485: InitSerialPort Start ...
+DBG : T: 12/08/15 00:37:52:702: c/l2frame/sps485.c: 229 : SPS485: COM 2 has been openned
+DBG : T: 12/08/15 00:37:52:703: c/l2frame/sps485.c: 433 : SPS485: InitSerialPort serial port COM2 open successfully.
+DBG : T: 12/08/15 00:37:52:703: c/l2frame/sps485.c: 364 : SPS485: COM port flags: c_cflag = 0x8BD, c_iflag = 0x0, c_oflag = 0x0, c_lflag = 0x0, VTIME = 0x0, TMIN = 0x1
+DBG : T: 12/08/15 00:37:52:703: c/l2frame/sps485.c: 366 : SPS485: COM port set done!
+DBG : T: 12/08/15 00:37:52:703: c/l2frame/sps485.c: 441 : SPS485: InitSerialPort serial port COM2 properties has been set successfully.
+DBG : T: 12/08/15 00:37:52:703: c/l2frame/sps485.c: 444 : SPS485: InitSerialPort completed.
+DBG : T: 12/08/15 00:37:52:703: c/l2frame/modbus.c: 281 : MODBUS: Init Serial Port Success ...
+DBG : T: 12/08/15 00:37:52:703: c/l2frame/modbus.c: 285 : MODBUS: COM port flags: VTIME = 0x0, TMIN = 0x17
+DBG : T: 12/08/15 00:37:52:703: c/l2frame/modbus.c: 296 : MODBUS: Send PM25 data succeed: 01 03 00 04 00 06 84 09
+DBG : T: 12/08/15 00:37:52:784: c/l2frame/modbus.c: 306 : MODBUS: Len 17  
+DBG : T: 12/08/15 00:37:52:784: c/l2frame/modbus.c: 307 : MODBUS: Received PM2.5 data succeed: 01 03 0C 00 00 00 00 00 00 00 00 00 65 00 00 83 6F
+DBG : T: 12/08/15 00:37:52:784: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=27[MSG_ID_MODBUS_PM25_DATA_REPORT],DID=1C[PM25],SID=18[MODBUS],LEN=40
+DBG : T: 12/08/15 00:37:52:785: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=1D[MSG_ID_PM25_CLOUD_DATA_RESP],DID=17[CLOUD],SID=1C[PM25],LEN=40
+DBG : T: 12/08/15 00:37:52:785: 2frame/cloudcont.c: 875 : CLOUD: Data record save to MEM-DISC, sid=6, totalNbr=6, offNbr=1
+DBG : T: 12/08/15 00:37:55:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=1A[MSG_ID_EMC_MODBUS_DATA_READ],DID=18[MODBUS],SID=1A[EMC],LEN=12
+DBG : T: 12/08/15 00:37:55:702: c/l2frame/modbus.c: 144 : MODBUS: Preparing send modbus EMC req data = 05 03 00 04 00 01 C4 4F
+DBG : T: 12/08/15 00:37:55:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=26[MSG_ID_MODBUS_EMC_DATA_REPORT],DID=1A[EMC],SID=18[MODBUS],LEN=32
+DBG : T: 12/08/15 00:37:55:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=1B[MSG_ID_EMC_MODBUS_DATA_READ],DID=17[CLOUD],SID=1A[EMC],LEN=32
+DBG : T: 12/08/15 00:37:55:703: 2frame/cloudcont.c: 875 : CLOUD: Data record save to MEM-DISC, sid=7, totalNbr=7, offNbr=1
+DBG : T: 12/08/15 00:37:58:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=1C[MSG_ID_PM25_MODBUS_DATA_READ],DID=18[MODBUS],SID=1C[PM25],LEN=12
+DBG : T: 12/08/15 00:37:58:702: c/l2frame/modbus.c: 270 : MODBUS: Preparing send modbus PM25 req data = 01 03 00 04 00 06 84 09
+DBG : T: 12/08/15 00:37:58:702: c/l2frame/sps485.c: 425 : SPS485: InitSerialPort Start ...
+DBG : T: 12/08/15 00:37:58:702: c/l2frame/sps485.c: 229 : SPS485: COM 2 has been openned
+DBG : T: 12/08/15 00:37:58:703: c/l2frame/sps485.c: 433 : SPS485: InitSerialPort serial port COM2 open successfully.
+DBG : T: 12/08/15 00:37:58:703: c/l2frame/sps485.c: 364 : SPS485: COM port flags: c_cflag = 0x8BD, c_iflag = 0x0, c_oflag = 0x0, c_lflag = 0x0, VTIME = 0x0, TMIN = 0x1
+DBG : T: 12/08/15 00:37:58:703: c/l2frame/sps485.c: 366 : SPS485: COM port set done!
+DBG : T: 12/08/15 00:37:58:703: c/l2frame/sps485.c: 441 : SPS485: InitSerialPort serial port COM2 properties has been set successfully.
+DBG : T: 12/08/15 00:37:58:703: c/l2frame/sps485.c: 444 : SPS485: InitSerialPort completed.
+DBG : T: 12/08/15 00:37:58:703: c/l2frame/modbus.c: 281 : MODBUS: Init Serial Port Success ...
+DBG : T: 12/08/15 00:37:58:703: c/l2frame/modbus.c: 285 : MODBUS: COM port flags: VTIME = 0x0, TMIN = 0x17
+DBG : T: 12/08/15 00:37:58:703: c/l2frame/modbus.c: 296 : MODBUS: Send PM25 data succeed: 01 03 00 04 00 06 84 09
+DBG : T: 12/08/15 00:37:58:785: c/l2frame/modbus.c: 306 : MODBUS: Len 17  
+DBG : T: 12/08/15 00:37:58:785: c/l2frame/modbus.c: 307 : MODBUS: Received PM2.5 data succeed: 01 03 0C 00 00 00 00 00 00 00 00 00 65 00 00 83 6F
+DBG : T: 12/08/15 00:37:58:785: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=27[MSG_ID_MODBUS_PM25_DATA_REPORT],DID=1C[PM25],SID=18[MODBUS],LEN=40
+DBG : T: 12/08/15 00:37:58:785: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=1D[MSG_ID_PM25_CLOUD_DATA_RESP],DID=17[CLOUD],SID=1C[PM25],LEN=40
+DBG : T: 12/08/15 00:37:58:785: 2frame/cloudcont.c: 875 : CLOUD: Data record save to MEM-DISC, sid=8, totalNbr=8, offNbr=1
+DBG : T: 12/08/15 00:38:00:789: l2frame/ethernet.c: 260 : ETHERNET: curl_easy_perform() failed: Couldn't resolve host name
+DBG : T: 12/08/15 00:38:00:789: 2frame/cloudcont.c: 1140: MODBUS: Error send data to back-cloud!
+DBG : T: 12/08/15 00:38:00:789: 2frame/cloudcont.c: 511 : CLOUD: Package message error!
+DBG : T: 12/08/15 00:38:00:789: rc/comvm/vmlayer.c: 1006: HCU-VM: Internal error is found in the state function.
+DBG : T: 12/08/15 00:38:00:789: rc/comvm/vmlayer.c: 918 : HCU-VM: Error execute FsmRun state machine!
+DBG : T: 12/08/15 00:38:00:789: 2frame/cloudcont.c: 929 : CLOUD: Data record read from MEM-DISC, rdCnt=1, totalNbr = 7, offNbr=0
+DBG : T: 12/08/15 00:38:00:789: 2frame/cloudcont.c: 995 : CLOUD: Send data len=310, String= [<xml><ToUserName><![CDATA[SAE_MFUNHCU]]></ToUserName><FromUserName><![CDATA[HCU_SH_0301]]></FromUserName><CreateTime>201511080037</CreateTime><MsgType><![CDATA[DEV_REPORT]]></MsgType><Content><![CDATA[250001050000000000000000000000000000000000000000000000005665B5D1]]></Content><FuncFlag>0</FuncFlag></xml>]
+DBG : T: 12/08/15 00:38:01:193: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=08[MSG_ID_ETHERNET_CLOUD_DATA_RX],DID=17[CLOUD],SID=0C[ETHERNET],LEN=128
+DBG : T: 12/08/15 00:38:01:193: 2frame/cloudcont.c: 426 : CLOUD: Under online state, FAKE mode send off-line data to cloud success!
+DBG : T: 12/08/15 00:38:01:193: 2frame/cloudcont.c: 963 : CLOUD: Send data len=290, String= [<xml><ToUserName><![CDATA[SAE_MFUNHCU]]></ToUserName><FromUserName><![CDATA[HCU_SH_0301]]></FromUserName><CreateTime>201511080037</CreateTime><MsgType><![CDATA[DEV_REPORT]]></MsgType><Content><![CDATA[200001051234000001BC0000022B0000029A5665B5D7]]></Content><FuncFlag>0</FuncFlag></xml>]
+DBG : T: 12/08/15 00:38:01:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=1A[MSG_ID_EMC_MODBUS_DATA_READ],DID=18[MODBUS],SID=1A[EMC],LEN=12
+DBG : T: 12/08/15 00:38:01:702: c/l2frame/modbus.c: 144 : MODBUS: Preparing send modbus EMC req data = 05 03 00 04 00 01 C4 4F
+DBG : T: 12/08/15 00:38:01:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=26[MSG_ID_MODBUS_EMC_DATA_REPORT],DID=1A[EMC],SID=18[MODBUS],LEN=32
+DBG : T: 12/08/15 00:38:01:703: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=1B[MSG_ID_EMC_MODBUS_DATA_READ],DID=17[CLOUD],SID=1A[EMC],LEN=32
+DBG : T: 12/08/15 00:38:01:703: 2frame/cloudcont.c: 875 : CLOUD: Data record save to MEM-DISC, sid=9, totalNbr=8, offNbr=0
+DBG : T: 12/08/15 00:38:04:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=1C[MSG_ID_PM25_MODBUS_DATA_READ],DID=18[MODBUS],SID=1C[PM25],LEN=12
+DBG : T: 12/08/15 00:38:04:702: c/l2frame/modbus.c: 270 : MODBUS: Preparing send modbus PM25 req data = 01 03 00 04 00 06 84 09
+DBG : T: 12/08/15 00:38:04:702: c/l2frame/sps485.c: 425 : SPS485: InitSerialPort Start ...
+DBG : T: 12/08/15 00:38:04:702: c/l2frame/sps485.c: 229 : SPS485: COM 2 has been openned
+DBG : T: 12/08/15 00:38:04:702: c/l2frame/sps485.c: 433 : SPS485: InitSerialPort serial port COM2 open successfully.
+DBG : T: 12/08/15 00:38:04:703: c/l2frame/sps485.c: 364 : SPS485: COM port flags: c_cflag = 0x8BD, c_iflag = 0x0, c_oflag = 0x0, c_lflag = 0x0, VTIME = 0x0, TMIN = 0x1
+DBG : T: 12/08/15 00:38:04:703: c/l2frame/sps485.c: 366 : SPS485: COM port set done!
+DBG : T: 12/08/15 00:38:04:703: c/l2frame/sps485.c: 441 : SPS485: InitSerialPort serial port COM2 properties has been set successfully.
+DBG : T: 12/08/15 00:38:04:703: c/l2frame/sps485.c: 444 : SPS485: InitSerialPort completed.
+DBG : T: 12/08/15 00:38:04:703: c/l2frame/modbus.c: 281 : MODBUS: Init Serial Port Success ...
+DBG : T: 12/08/15 00:38:04:703: c/l2frame/modbus.c: 285 : MODBUS: COM port flags: VTIME = 0x0, TMIN = 0x17
+DBG : T: 12/08/15 00:38:04:703: c/l2frame/modbus.c: 296 : MODBUS: Send PM25 data succeed: 01 03 00 04 00 06 84 09
+DBG : T: 12/08/15 00:38:04:784: c/l2frame/modbus.c: 306 : MODBUS: Len 17  
+DBG : T: 12/08/15 00:38:04:785: c/l2frame/modbus.c: 307 : MODBUS: Received PM2.5 data succeed: 01 03 0C 00 00 00 00 00 00 00 00 00 65 00 00 83 6F
+DBG : T: 12/08/15 00:38:04:785: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=27[MSG_ID_MODBUS_PM25_DATA_REPORT],DID=1C[PM25],SID=18[MODBUS],LEN=40
+DBG : T: 12/08/15 00:38:04:785: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=1D[MSG_ID_PM25_CLOUD_DATA_RESP],DID=17[CLOUD],SID=1C[PM25],LEN=40
+DBG : T: 12/08/15 00:38:04:785: 2frame/cloudcont.c: 875 : CLOUD: Data record save to MEM-DISC, sid=10, totalNbr=9, offNbr=0
+DBG : T: 12/08/15 00:38:07:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=1A[MSG_ID_EMC_MODBUS_DATA_READ],DID=18[MODBUS],SID=1A[EMC],LEN=12
+DBG : T: 12/08/15 00:38:07:702: c/l2frame/modbus.c: 144 : MODBUS: Preparing send modbus EMC req data = 05 03 00 04 00 01 C4 4F
+DBG : T: 12/08/15 00:38:07:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=26[MSG_ID_MODBUS_EMC_DATA_REPORT],DID=1A[EMC],SID=18[MODBUS],LEN=32
+DBG : T: 12/08/15 00:38:07:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=1B[MSG_ID_EMC_MODBUS_DATA_READ],DID=17[CLOUD],SID=1A[EMC],LEN=32
+DBG : T: 12/08/15 00:38:07:703: 2frame/cloudcont.c: 875 : CLOUD: Data record save to MEM-DISC, sid=11, totalNbr=10, offNbr=0
+DBG : T: 12/08/15 00:38:10:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=1C[MSG_ID_PM25_MODBUS_DATA_READ],DID=18[MODBUS],SID=1C[PM25],LEN=12
+DBG : T: 12/08/15 00:38:10:702: c/l2frame/modbus.c: 270 : MODBUS: Preparing send modbus PM25 req data = 01 03 00 04 00 06 84 09
+DBG : T: 12/08/15 00:38:10:702: c/l2frame/sps485.c: 425 : SPS485: InitSerialPort Start ...
+DBG : T: 12/08/15 00:38:10:702: c/l2frame/sps485.c: 229 : SPS485: COM 2 has been openned
+DBG : T: 12/08/15 00:38:10:703: c/l2frame/sps485.c: 433 : SPS485: InitSerialPort serial port COM2 open successfully.
+DBG : T: 12/08/15 00:38:10:703: c/l2frame/sps485.c: 364 : SPS485: COM port flags: c_cflag = 0x8BD, c_iflag = 0x0, c_oflag = 0x0, c_lflag = 0x0, VTIME = 0x0, TMIN = 0x1
+DBG : T: 12/08/15 00:38:10:703: c/l2frame/sps485.c: 366 : SPS485: COM port set done!
+DBG : T: 12/08/15 00:38:10:703: c/l2frame/sps485.c: 441 : SPS485: InitSerialPort serial port COM2 properties has been set successfully.
+DBG : T: 12/08/15 00:38:10:703: c/l2frame/sps485.c: 444 : SPS485: InitSerialPort completed.
+DBG : T: 12/08/15 00:38:10:703: c/l2frame/modbus.c: 281 : MODBUS: Init Serial Port Success ...
+DBG : T: 12/08/15 00:38:10:703: c/l2frame/modbus.c: 285 : MODBUS: COM port flags: VTIME = 0x0, TMIN = 0x17
+DBG : T: 12/08/15 00:38:10:703: c/l2frame/modbus.c: 296 : MODBUS: Send PM25 data succeed: 01 03 00 04 00 06 84 09
+DBG : T: 12/08/15 00:38:10:785: c/l2frame/modbus.c: 306 : MODBUS: Len 17  
+DBG : T: 12/08/15 00:38:10:785: c/l2frame/modbus.c: 307 : MODBUS: Received PM2.5 data succeed: 01 03 0C 00 00 00 00 00 00 00 00 00 65 00 00 83 6F
+DBG : T: 12/08/15 00:38:10:785: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=27[MSG_ID_MODBUS_PM25_DATA_REPORT],DID=1C[PM25],SID=18[MODBUS],LEN=40
+DBG : T: 12/08/15 00:38:10:785: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=1D[MSG_ID_PM25_CLOUD_DATA_RESP],DID=17[CLOUD],SID=1C[PM25],LEN=40
+DBG : T: 12/08/15 00:38:10:785: 2frame/cloudcont.c: 875 : CLOUD: Data record save to MEM-DISC, sid=12, totalNbr=11, offNbr=0
+DBG : T: 12/08/15 00:38:11:609: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=08[MSG_ID_ETHERNET_CLOUD_DATA_RX],DID=17[CLOUD],SID=0C[ETHERNET],LEN=88
+DBG : T: 12/08/15 00:38:11:609: 2frame/cloudcont.c: 474 : CLOUD: Online state, FAKE mode send instance/period EMC to cloud success!
+DBG : T: 12/08/15 00:38:11:609: 2frame/cloudcont.c: 995 : CLOUD: Send data len=310, String= [<xml><ToUserName><![CDATA[SAE_MFUNHCU]]></ToUserName><FromUserName><![CDATA[HCU_SH_0301]]></FromUserName><CreateTime>201511080038</CreateTime><MsgType><![CDATA[DEV_REPORT]]></MsgType><Content><![CDATA[25000101000000000000000000000065000001BC0000022B0000029A5665B5DA]]></Content><FuncFlag>0</FuncFlag></xml>]
+DBG : T: 12/08/15 00:38:13:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=1A[MSG_ID_EMC_MODBUS_DATA_READ],DID=18[MODBUS],SID=1A[EMC],LEN=12
+DBG : T: 12/08/15 00:38:13:702: c/l2frame/modbus.c: 144 : MODBUS: Preparing send modbus EMC req data = 05 03 00 04 00 01 C4 4F
+DBG : T: 12/08/15 00:38:13:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=26[MSG_ID_MODBUS_EMC_DATA_REPORT],DID=1A[EMC],SID=18[MODBUS],LEN=32
+DBG : T: 12/08/15 00:38:13:703: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=1B[MSG_ID_EMC_MODBUS_DATA_READ],DID=17[CLOUD],SID=1A[EMC],LEN=32
+DBG : T: 12/08/15 00:38:13:703: 2frame/cloudcont.c: 875 : CLOUD: Data record save to MEM-DISC, sid=13, totalNbr=12, offNbr=0
+DBG : T: 12/08/15 00:38:16:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=1C[MSG_ID_PM25_MODBUS_DATA_READ],DID=18[MODBUS],SID=1C[PM25],LEN=12
+DBG : T: 12/08/15 00:38:16:702: c/l2frame/modbus.c: 270 : MODBUS: Preparing send modbus PM25 req data = 01 03 00 04 00 06 84 09
+DBG : T: 12/08/15 00:38:16:702: c/l2frame/sps485.c: 425 : SPS485: InitSerialPort Start ...
+DBG : T: 12/08/15 00:38:16:702: c/l2frame/sps485.c: 229 : SPS485: COM 2 has been openned
+DBG : T: 12/08/15 00:38:16:703: c/l2frame/sps485.c: 433 : SPS485: InitSerialPort serial port COM2 open successfully.
+DBG : T: 12/08/15 00:38:16:703: c/l2frame/sps485.c: 364 : SPS485: COM port flags: c_cflag = 0x8BD, c_iflag = 0x0, c_oflag = 0x0, c_lflag = 0x0, VTIME = 0x0, TMIN = 0x1
+DBG : T: 12/08/15 00:38:16:703: c/l2frame/sps485.c: 366 : SPS485: COM port set done!
+DBG : T: 12/08/15 00:38:16:703: c/l2frame/sps485.c: 441 : SPS485: InitSerialPort serial port COM2 properties has been set successfully.
+DBG : T: 12/08/15 00:38:16:703: c/l2frame/sps485.c: 444 : SPS485: InitSerialPort completed.
+DBG : T: 12/08/15 00:38:16:703: c/l2frame/modbus.c: 281 : MODBUS: Init Serial Port Success ...
+DBG : T: 12/08/15 00:38:16:703: c/l2frame/modbus.c: 285 : MODBUS: COM port flags: VTIME = 0x0, TMIN = 0x17
+DBG : T: 12/08/15 00:38:16:703: c/l2frame/modbus.c: 296 : MODBUS: Send PM25 data succeed: 01 03 00 04 00 06 84 09
+DBG : T: 12/08/15 00:38:16:785: c/l2frame/modbus.c: 306 : MODBUS: Len 17  
+DBG : T: 12/08/15 00:38:16:785: c/l2frame/modbus.c: 307 : MODBUS: Received PM2.5 data succeed: 01 03 0C 00 00 00 00 00 00 00 00 00 65 00 00 83 6F
+DBG : T: 12/08/15 00:38:16:785: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=27[MSG_ID_MODBUS_PM25_DATA_REPORT],DID=1C[PM25],SID=18[MODBUS],LEN=40
+DBG : T: 12/08/15 00:38:16:785: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=1D[MSG_ID_PM25_CLOUD_DATA_RESP],DID=17[CLOUD],SID=1C[PM25],LEN=40
+DBG : T: 12/08/15 00:38:16:785: 2frame/cloudcont.c: 875 : CLOUD: Data record save to MEM-DISC, sid=14, totalNbr=13, offNbr=0
+DBG : T: 12/08/15 00:38:19:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=1A[MSG_ID_EMC_MODBUS_DATA_READ],DID=18[MODBUS],SID=1A[EMC],LEN=12
+DBG : T: 12/08/15 00:38:19:702: c/l2frame/modbus.c: 144 : MODBUS: Preparing send modbus EMC req data = 05 03 00 04 00 01 C4 4F
+DBG : T: 12/08/15 00:38:19:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=26[MSG_ID_MODBUS_EMC_DATA_REPORT],DID=1A[EMC],SID=18[MODBUS],LEN=32
+DBG : T: 12/08/15 00:38:19:703: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=1B[MSG_ID_EMC_MODBUS_DATA_READ],DID=17[CLOUD],SID=1A[EMC],LEN=32
+DBG : T: 12/08/15 00:38:19:703: 2frame/cloudcont.c: 875 : CLOUD: Data record save to MEM-DISC, sid=15, totalNbr=14, offNbr=0
+DBG : T: 12/08/15 00:38:22:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=1C[MSG_ID_PM25_MODBUS_DATA_READ],DID=18[MODBUS],SID=1C[PM25],LEN=12
+DBG : T: 12/08/15 00:38:22:702: c/l2frame/modbus.c: 270 : MODBUS: Preparing send modbus PM25 req data = 01 03 00 04 00 06 84 09
+DBG : T: 12/08/15 00:38:22:702: c/l2frame/sps485.c: 425 : SPS485: InitSerialPort Start ...
+DBG : T: 12/08/15 00:38:22:702: c/l2frame/sps485.c: 229 : SPS485: COM 2 has been openned
+DBG : T: 12/08/15 00:38:22:703: c/l2frame/sps485.c: 433 : SPS485: InitSerialPort serial port COM2 open successfully.
+DBG : T: 12/08/15 00:38:22:703: c/l2frame/sps485.c: 364 : SPS485: COM port flags: c_cflag = 0x8BD, c_iflag = 0x0, c_oflag = 0x0, c_lflag = 0x0, VTIME = 0x0, TMIN = 0x1
+DBG : T: 12/08/15 00:38:22:703: c/l2frame/sps485.c: 366 : SPS485: COM port set done!
+DBG : T: 12/08/15 00:38:22:703: c/l2frame/sps485.c: 441 : SPS485: InitSerialPort serial port COM2 properties has been set successfully.
+DBG : T: 12/08/15 00:38:22:703: c/l2frame/sps485.c: 444 : SPS485: InitSerialPort completed.
+DBG : T: 12/08/15 00:38:22:703: c/l2frame/modbus.c: 281 : MODBUS: Init Serial Port Success ...
+DBG : T: 12/08/15 00:38:22:703: c/l2frame/modbus.c: 285 : MODBUS: COM port flags: VTIME = 0x0, TMIN = 0x17
+DBG : T: 12/08/15 00:38:22:703: c/l2frame/modbus.c: 296 : MODBUS: Send PM25 data succeed: 01 03 00 04 00 06 84 09
+DBG : T: 12/08/15 00:38:22:785: c/l2frame/modbus.c: 306 : MODBUS: Len 17  
+DBG : T: 12/08/15 00:38:22:785: c/l2frame/modbus.c: 307 : MODBUS: Received PM2.5 data succeed: 01 03 0C 00 00 00 00 00 00 00 00 00 65 00 00 83 6F
+DBG : T: 12/08/15 00:38:22:785: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=27[MSG_ID_MODBUS_PM25_DATA_REPORT],DID=1C[PM25],SID=18[MODBUS],LEN=40
+DBG : T: 12/08/15 00:38:22:785: rc/comvm/vmlayer.c: 338 : HCU-VM: msgsnd() write msg failed, errno=11[Resource temporarily unavailable]
+DBG : T: 12/08/15 00:38:22:786: l3app/sensorpm25.c: 332 : PM25: Send message error, TASK [PM25] to TASK[CLOUD]!
+DBG : T: 12/08/15 00:38:22:786: rc/comvm/vmlayer.c: 1006: HCU-VM: Internal error is found in the state function.
+DBG : T: 12/08/15 00:38:22:786: rc/comvm/vmlayer.c: 918 : HCU-VM: Error execute FsmRun state machine!
+DBG : T: 12/08/15 00:38:25:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=1A[MSG_ID_EMC_MODBUS_DATA_READ],DID=18[MODBUS],SID=1A[EMC],LEN=12
+DBG : T: 12/08/15 00:38:25:702: c/l2frame/modbus.c: 144 : MODBUS: Preparing send modbus EMC req data = 05 03 00 04 00 01 C4 4F
+DBG : T: 12/08/15 00:38:25:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=26[MSG_ID_MODBUS_EMC_DATA_REPORT],DID=1A[EMC],SID=18[MODBUS],LEN=32
+DBG : T: 12/08/15 00:38:25:703: rc/comvm/vmlayer.c: 338 : HCU-VM: msgsnd() write msg failed, errno=11[Resource temporarily unavailable]
+DBG : T: 12/08/15 00:38:25:703: /l3app/sensoremc.c: 327 : EMC: Send message error, TASK [EMC] to TASK[CLOUD]!
+DBG : T: 12/08/15 00:38:25:703: rc/comvm/vmlayer.c: 1006: HCU-VM: Internal error is found in the state function.
+DBG : T: 12/08/15 00:38:25:703: rc/comvm/vmlayer.c: 918 : HCU-VM: Error execute FsmRun state machine!
+DBG : T: 12/08/15 00:38:29:644: l2frame/ethernet.c: 144 : ETHERNET: curl_easy_perform() failed: Couldn't resolve host name
+DBG : T: 12/08/15 00:38:30:702: rc/comvm/vmlayer.c: 338 : HCU-VM: msgsnd() write msg failed, errno=11[Resource temporarily unavailable]
+DBG : T: 12/08/15 00:38:30:702: /src/comvm/timer.c: 241 : TIMER: Send message error, TASK [TIMER] to TASK[CLOUD]!
+DBG : T: 12/08/15 00:38:31:611: l2frame/ethernet.c: 260 : ETHERNET: curl_easy_perform() failed: Couldn't resolve host name
+DBG : T: 12/08/15 00:38:31:612: 2frame/cloudcont.c: 1140: MODBUS: Error send data to back-cloud!
+DBG : T: 12/08/15 00:38:31:612: 2frame/cloudcont.c: 511 : CLOUD: Package message error!
+DBG : T: 12/08/15 00:38:31:612: rc/comvm/vmlayer.c: 1006: HCU-VM: Internal error is found in the state function.
+DBG : T: 12/08/15 00:38:31:612: rc/comvm/vmlayer.c: 918 : HCU-VM: Error execute FsmRun state machine!
+DBG : T: 12/08/15 00:38:31:612: 2frame/cloudcont.c: 963 : CLOUD: Send data len=290, String= [<xml><ToUserName><![CDATA[SAE_MFUNHCU]]></ToUserName><FromUserName><![CDATA[HCU_SH_0301]]></FromUserName><CreateTime>201511080038</CreateTime><MsgType><![CDATA[DEV_REPORT]]></MsgType><Content><![CDATA[200001051234000001BC0000022B0000029A5665B5DD]]></Content><FuncFlag>0</FuncFlag></xml>]
+DBG : T: 12/08/15 00:38:31:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=20[MSG_ID_WINDSPD_MODBUS_DATA_READ],DID=18[MODBUS],SID=1F[WINDSPD],LEN=12
+DBG : T: 12/08/15 00:38:31:702: c/l2frame/modbus.c: 500 : MODBUS: Preparing send modbus windspd req data = 02 03 00 00 00 01 84 39
+DBG : T: 12/08/15 00:38:31:702: c/l2frame/sps485.c: 425 : SPS485: InitSerialPort Start ...
+DBG : T: 12/08/15 00:38:31:703: c/l2frame/sps485.c: 229 : SPS485: COM 2 has been openned
+DBG : T: 12/08/15 00:38:31:703: c/l2frame/sps485.c: 433 : SPS485: InitSerialPort serial port COM2 open successfully.
+DBG : T: 12/08/15 00:38:31:703: c/l2frame/sps485.c: 364 : SPS485: COM port flags: c_cflag = 0x8BD, c_iflag = 0x0, c_oflag = 0x0, c_lflag = 0x0, VTIME = 0x0, TMIN = 0x1
+DBG : T: 12/08/15 00:38:31:703: c/l2frame/sps485.c: 366 : SPS485: COM port set done!
+DBG : T: 12/08/15 00:38:31:703: c/l2frame/sps485.c: 441 : SPS485: InitSerialPort serial port COM2 properties has been set successfully.
+DBG : T: 12/08/15 00:38:31:703: c/l2frame/sps485.c: 444 : SPS485: InitSerialPort completed.
+DBG : T: 12/08/15 00:38:31:703: c/l2frame/modbus.c: 512 : MODBUS: Init Serial Port Success ...
+DBG : T: 12/08/15 00:38:31:703: c/l2frame/modbus.c: 516 : MODBUS: COM port flags: VTIME = 0x0, TMIN = 0x7
+DBG : T: 12/08/15 00:38:31:703: c/l2frame/modbus.c: 526 : MODBUS: Send windspd req data succeed: 02 03 00 00 00 01 84 39
+DBG : T: 12/08/15 00:38:31:703: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=24[MSG_ID_HUMID_MODBUS_DATA_READ],DID=18[MODBUS],SID=1B[HUMID],LEN=12
+DBG : T: 12/08/15 00:38:33:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=22[MSG_ID_TEMP_MODBUS_DATA_READ],DID=18[MODBUS],SID=1D[TEMP],LEN=12
+DBG : T: 12/08/15 00:38:35:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=1E[MSG_ID_WINDDIR_MODBUS_DATA_READ],DID=18[MODBUS],SID=1E[WINDDIR],LEN=12
+DBG : T: 12/08/15 00:38:36:991: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=08[MSG_ID_ETHERNET_CLOUD_DATA_RX],DID=17[CLOUD],SID=0C[ETHERNET],LEN=88
+DBG : T: 12/08/15 00:38:36:991: 2frame/cloudcont.c: 474 : CLOUD: Online state, FAKE mode send instance/period EMC to cloud success!
+DBG : T: 12/08/15 00:38:36:991: 2frame/cloudcont.c: 995 : CLOUD: Send data len=310, String= [<xml><ToUserName><![CDATA[SAE_MFUNHCU]]></ToUserName><FromUserName><![CDATA[HCU_SH_0301]]></FromUserName><CreateTime>201511080038</CreateTime><MsgType><![CDATA[DEV_REPORT]]></MsgType><Content><![CDATA[25000101000000000000000000000065000001BC0000022B0000029A5665B5E0]]></Content><FuncFlag>0</FuncFlag></xml>]
+DBG : T: 12/08/15 00:38:51:993: l2frame/ethernet.c: 144 : ETHERNET: curl_easy_perform() failed: Couldn't resolve host name
+DBG : T: 12/08/15 00:38:52:370: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=08[MSG_ID_ETHERNET_CLOUD_DATA_RX],DID=17[CLOUD],SID=0C[ETHERNET],LEN=128
+DBG : T: 12/08/15 00:38:52:370: 2frame/cloudcont.c: 520 : CLOUD: Online state, FAKE mode send instance/period PM25 to cloud success!
+DBG : T: 12/08/15 00:38:52:370: 2frame/cloudcont.c: 963 : CLOUD: Send data len=290, String= [<xml><ToUserName><![CDATA[SAE_MFUNHCU]]></ToUserName><FromUserName><![CDATA[HCU_SH_0301]]></FromUserName><CreateTime>201511080038</CreateTime><MsgType><![CDATA[DEV_REPORT]]></MsgType><Content><![CDATA[200001051234000001BC0000022B0000029A5665B5E3]]></Content><FuncFlag>0</FuncFlag></xml>]
+DBG : T: 12/08/15 00:38:52:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=1C[MSG_ID_PM25_MODBUS_DATA_READ],DID=18[MODBUS],SID=1C[PM25],LEN=12
+DBG : T: 12/08/15 00:38:55:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=1A[MSG_ID_EMC_MODBUS_DATA_READ],DID=18[MODBUS],SID=1A[EMC],LEN=12
+DBG : T: 12/08/15 00:38:57:690: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=08[MSG_ID_ETHERNET_CLOUD_DATA_RX],DID=17[CLOUD],SID=0C[ETHERNET],LEN=88
+DBG : T: 12/08/15 00:38:57:690: 2frame/cloudcont.c: 474 : CLOUD: Online state, FAKE mode send instance/period EMC to cloud success!
+DBG : T: 12/08/15 00:38:57:690: 2frame/cloudcont.c: 995 : CLOUD: Send data len=310, String= [<xml><ToUserName><![CDATA[SAE_MFUNHCU]]></ToUserName><FromUserName><![CDATA[HCU_SH_0301]]></FromUserName><CreateTime>201511080038</CreateTime><MsgType><![CDATA[DEV_REPORT]]></MsgType><Content><![CDATA[25000101000000000000000000000065000001BC0000022B0000029A5665B5E6]]></Content><FuncFlag>0</FuncFlag></xml>]
+DBG : T: 12/08/15 00:38:58:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=1C[MSG_ID_PM25_MODBUS_DATA_READ],DID=18[MODBUS],SID=1C[PM25],LEN=12
+DBG : T: 12/08/15 00:39:01:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=1A[MSG_ID_EMC_MODBUS_DATA_READ],DID=18[MODBUS],SID=1A[EMC],LEN=12
+DBG : T: 12/08/15 00:39:04:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=1C[MSG_ID_PM25_MODBUS_DATA_READ],DID=18[MODBUS],SID=1C[PM25],LEN=12
+DBG : T: 12/08/15 00:39:07:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=1A[MSG_ID_EMC_MODBUS_DATA_READ],DID=18[MODBUS],SID=1A[EMC],LEN=12
+DBG : T: 12/08/15 00:39:10:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=1C[MSG_ID_PM25_MODBUS_DATA_READ],DID=18[MODBUS],SID=1C[PM25],LEN=12
+DBG : T: 12/08/15 00:39:13:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=1A[MSG_ID_EMC_MODBUS_DATA_READ],DID=18[MODBUS],SID=1A[EMC],LEN=12
+DBG : T: 12/08/15 00:39:16:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=1C[MSG_ID_PM25_MODBUS_DATA_READ],DID=18[MODBUS],SID=1C[PM25],LEN=12
+DBG : T: 12/08/15 00:39:17:692: l2frame/ethernet.c: 260 : ETHERNET: curl_easy_perform() failed: Couldn't resolve host name
+DBG : T: 12/08/15 00:39:17:693: 2frame/cloudcont.c: 1140: MODBUS: Error send data to back-cloud!
+DBG : T: 12/08/15 00:39:17:693: 2frame/cloudcont.c: 511 : CLOUD: Package message error!
+DBG : T: 12/08/15 00:39:17:693: rc/comvm/vmlayer.c: 1006: HCU-VM: Internal error is found in the state function.
+DBG : T: 12/08/15 00:39:17:693: rc/comvm/vmlayer.c: 918 : HCU-VM: Error execute FsmRun state machine!
+DBG : T: 12/08/15 00:39:17:693: 2frame/cloudcont.c: 1200: CLOUD: Receive data length = 128, data buffer = 32353030303130353030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303536363542354431 
+DBG : T: 12/08/15 00:39:17:693: 2frame/cloudcont.c: 963 : CLOUD: Send data len=290, String= [<xml><ToUserName><![CDATA[SAE_MFUNHCU]]></ToUserName><FromUserName><![CDATA[HCU_SH_0301]]></FromUserName><CreateTime>201511080039</CreateTime><MsgType><![CDATA[DEV_REPORT]]></MsgType><Content><![CDATA[200001051234000001BC0000022B0000029A5665B5E9]]></Content><FuncFlag>0</FuncFlag></xml>]
+DBG : T: 12/08/15 00:39:19:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=1A[MSG_ID_EMC_MODBUS_DATA_READ],DID=18[MODBUS],SID=1A[EMC],LEN=12
+DBG : T: 12/08/15 00:39:22:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=1C[MSG_ID_PM25_MODBUS_DATA_READ],DID=18[MODBUS],SID=1C[PM25],LEN=12
+DBG : T: 12/08/15 00:39:25:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=1A[MSG_ID_EMC_MODBUS_DATA_READ],DID=18[MODBUS],SID=1A[EMC],LEN=12
+DBG : T: 12/08/15 00:39:28:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=1C[MSG_ID_PM25_MODBUS_DATA_READ],DID=18[MODBUS],SID=1C[PM25],LEN=12
+DBG : T: 12/08/15 00:39:31:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=1A[MSG_ID_EMC_MODBUS_DATA_READ],DID=18[MODBUS],SID=1A[EMC],LEN=12
+DBG : T: 12/08/15 00:39:31:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=20[MSG_ID_WINDSPD_MODBUS_DATA_READ],DID=18[MODBUS],SID=1F[WINDSPD],LEN=12
+DBG : T: 12/08/15 00:39:31:703: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=24[MSG_ID_HUMID_MODBUS_DATA_READ],DID=18[MODBUS],SID=1B[HUMID],LEN=12
+DBG : T: 12/08/15 00:39:33:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=22[MSG_ID_TEMP_MODBUS_DATA_READ],DID=18[MODBUS],SID=1D[TEMP],LEN=12
+DBG : T: 12/08/15 00:39:34:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=1C[MSG_ID_PM25_MODBUS_DATA_READ],DID=18[MODBUS],SID=1C[PM25],LEN=12
+DBG : T: 12/08/15 00:39:35:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=1E[MSG_ID_WINDDIR_MODBUS_DATA_READ],DID=18[MODBUS],SID=1E[WINDDIR],LEN=12
+DBG : T: 12/08/15 00:39:37:695: l2frame/ethernet.c: 260 : ETHERNET: curl_easy_perform() failed: Couldn't resolve host name
+DBG : T: 12/08/15 00:39:37:695: 2frame/cloudcont.c: 1140: MODBUS: Error send data to back-cloud!
+DBG : T: 12/08/15 00:39:37:695: 2frame/cloudcont.c: 465 : CLOUD: Error send data to back-cloud!
+DBG : T: 12/08/15 00:39:37:695: rc/comvm/vmlayer.c: 1006: HCU-VM: Internal error is found in the state function.
+DBG : T: 12/08/15 00:39:37:695: rc/comvm/vmlayer.c: 918 : HCU-VM: Error execute FsmRun state machine!
+DBG : T: 12/08/15 00:39:37:695: 2frame/cloudcont.c: 995 : CLOUD: Send data len=310, String= [<xml><ToUserName><![CDATA[SAE_MFUNHCU]]></ToUserName><FromUserName><![CDATA[HCU_SH_0301]]></FromUserName><CreateTime>201511080039</CreateTime><MsgType><![CDATA[DEV_REPORT]]></MsgType><Content><![CDATA[25000101000000000000000000000065000001BC0000022B0000029A5665B5EC]]></Content><FuncFlag>0</FuncFlag></xml>]
+DBG : T: 12/08/15 00:39:37:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=1A[MSG_ID_EMC_MODBUS_DATA_READ],DID=18[MODBUS],SID=1A[EMC],LEN=12
+DBG : T: 12/08/15 00:39:40:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=1C[MSG_ID_PM25_MODBUS_DATA_READ],DID=18[MODBUS],SID=1C[PM25],LEN=12
+DBG : T: 12/08/15 00:39:43:081: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=08[MSG_ID_ETHERNET_CLOUD_DATA_RX],DID=17[CLOUD],SID=0C[ETHERNET],LEN=128
+DBG : T: 12/08/15 00:39:43:081: 2frame/cloudcont.c: 520 : CLOUD: Online state, FAKE mode send instance/period PM25 to cloud success!
+DBG : T: 12/08/15 00:39:43:081: 2frame/cloudcont.c: 963 : CLOUD: Send data len=290, String= [<xml><ToUserName><![CDATA[SAE_MFUNHCU]]></ToUserName><FromUserName><![CDATA[HCU_SH_0301]]></FromUserName><CreateTime>201511080039</CreateTime><MsgType><![CDATA[DEV_REPORT]]></MsgType><Content><![CDATA[200001051234000001BC0000022B0000029A5665B5EF]]></Content><FuncFlag>0</FuncFlag></xml>]
+DBG : T: 12/08/15 00:39:43:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=1A[MSG_ID_EMC_MODBUS_DATA_READ],DID=18[MODBUS],SID=1A[EMC],LEN=12
+DBG : T: 12/08/15 00:39:46:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=1C[MSG_ID_PM25_MODBUS_DATA_READ],DID=18[MODBUS],SID=1C[PM25],LEN=12
+DBG : T: 12/08/15 00:39:49:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=1A[MSG_ID_EMC_MODBUS_DATA_READ],DID=18[MODBUS],SID=1A[EMC],LEN=12
+DBG : T: 12/08/15 00:39:51:782: l2frame/ethernet.c: 144 : ETHERNET: curl_easy_perform() failed: Couldn't resolve host name
+DBG : T: 12/08/15 00:39:52:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=1C[MSG_ID_PM25_MODBUS_DATA_READ],DID=18[MODBUS],SID=1C[PM25],LEN=12
+DBG : T: 12/08/15 00:39:55:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=1A[MSG_ID_EMC_MODBUS_DATA_READ],DID=18[MODBUS],SID=1A[EMC],LEN=12
+DBG : T: 12/08/15 00:39:58:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=1C[MSG_ID_PM25_MODBUS_DATA_READ],DID=18[MODBUS],SID=1C[PM25],LEN=12
+DBG : T: 12/08/15 00:40:01:702: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=1A[MSG_ID_EMC_MODBUS_DATA_READ],DID=18[MODBUS],SID=1A[EMC],LEN=12
+DBG : T: 12/08/15 00:40:03:083: l2frame/ethernet.c: 260 : ETHERNET: curl_easy_perform() failed: Couldn't resolve host name
+DBG : T: 12/08/15 00:40:03:083: 2frame/cloudcont.c: 1140: MODBUS: Error send data to back-cloud!
+DBG : T: 12/08/15 00:40:03:083: 2frame/cloudcont.c: 465 : CLOUD: Error send data to back-cloud!
+DBG : T: 12/08/15 00:40:03:083: rc/comvm/vmlayer.c: 1006: HCU-VM: Internal error is found in the state function.
+DBG : T: 12/08/15 00:40:03:083: rc/comvm/vmlayer.c: 918 : HCU-VM: Error execute FsmRun state machine!
+DBG : T: 12/08/15 00:40:03:083: 2frame/cloudcont.c: 995 : CLOUD: Send data len=310, String= [<xml><ToUserName><![CDATA[SAE_MFUNHCU]]></ToUserName><FromUserName><![CDATA[HCU_SH_0301]]></FromUserName><CreateTime>201511080039</CreateTime><MsgType><![CDATA[DEV_REPORT]]></MsgType><Content><![CDATA[25000101000000000000000000000065000001BC0000022B0000029A5665B5F2]]></Content><FuncFlag>0</FuncFlag></xml>]
+DBG : T: 12/08/15 00:40:04:702: rc/comvm/vmlayer.c: 338 : HCU-VM: msgsnd() write msg failed, errno=11[Resource temporarily unavailable]
+DBG : T: 12/08/15 00:40:04:702: l3app/sensorpm25.c: 194 : PM25: Send message error, TASK [PM25] to TASK[MODBUS]!
+DBG : T: 12/08/15 00:40:07:702: rc/comvm/vmlayer.c: 338 : HCU-VM: msgsnd() write msg failed, errno=11[Resource temporarily unavailable]
+DBG : T: 12/08/15 00:40:07:702: /l3app/sensoremc.c: 194 : EMC: Send message error, TASK [EMC] to TASK[MODBUS]!
+DBG : T: 12/08/15 00:40:10:702: rc/comvm/vmlayer.c: 338 : HCU-VM: msgsnd() write msg failed, errno=11[Resource temporarily unavailable]
+DBG : T: 12/08/15 00:40:10:702: l3app/sensorpm25.c: 194 : PM25: Send message error, TASK [PM25] to TASK[MODBUS]!
+DBG : T: 12/08/15 00:40:12:784: l2frame/ethernet.c: 144 : ETHERNET: curl_easy_perform() failed: Couldn't resolve host name
+DBG : T: 12/08/15 00:40:13:702: rc/comvm/vmlayer.c: 338 : HCU-VM: msgsnd() write msg failed, errno=11[Resource temporarily unavailable]
+DBG : T: 12/08/15 00:40:13:702: /l3app/sensoremc.c: 194 : EMC: Send message error, TASK [EMC] to TASK[MODBUS]!
+DBG : T: 12/08/15 00:40:16:702: rc/comvm/vmlayer.c: 338 : HCU-VM: msgsnd() write msg failed, errno=11[Resource temporarily unavailable]
+DBG : T: 12/08/15 00:40:16:702: l3app/sensorpm25.c: 194 : PM25: Send message error, TASK [PM25] to TASK[MODBUS]!
+DBG : T: 12/08/15 00:40:19:702: rc/comvm/vmlayer.c: 338 : HCU-VM: msgsnd() write msg failed, errno=11[Resource temporarily unavailable]
+DBG : T: 12/08/15 00:40:19:702: /l3app/sensoremc.c: 194 : EMC: Send message error, TASK [EMC] to TASK[MODBUS]!
+DBG : T: 12/08/15 00:40:22:702: rc/comvm/vmlayer.c: 338 : HCU-VM: msgsnd() write msg failed, errno=11[Resource temporarily unavailable]
+DBG : T: 12/08/15 00:40:22:702: l3app/sensorpm25.c: 194 : PM25: Send message error, TASK [PM25] to TASK[MODBUS]!
+DBG : T: 12/08/15 00:40:23:086: l2frame/ethernet.c: 260 : ETHERNET: curl_easy_perform() failed: Couldn't resolve host name
+DBG : T: 12/08/15 00:40:23:086: 2frame/cloudcont.c: 1140: MODBUS: Error send data to back-cloud!
+DBG : T: 12/08/15 00:40:23:086: 2frame/cloudcont.c: 511 : CLOUD: Package message error!
+DBG : T: 12/08/15 00:40:23:086: rc/comvm/vmlayer.c: 1006: HCU-VM: Internal error is found in the state function.
+DBG : T: 12/08/15 00:40:23:086: rc/comvm/vmlayer.c: 918 : HCU-VM: Error execute FsmRun state machine!
+DBG : T: 12/08/15 00:40:23:086: 2frame/cloudcont.c: 1200: CLOUD: Receive data length = 88, data buffer = 3230303030313035313233343030303030314243303030303032324230303030303239413536363542354437 
+DBG : T: 12/08/15 00:40:23:086: 2frame/cloudcont.c: 963 : CLOUD: Send data len=290, String= [<xml><ToUserName><![CDATA[SAE_MFUNHCU]]></ToUserName><FromUserName><![CDATA[HCU_SH_0301]]></FromUserName><CreateTime>201511080040</CreateTime><MsgType><![CDATA[DEV_REPORT]]></MsgType><Content><![CDATA[200001051234000001BC0000022B0000029A5665B5F5]]></Content><FuncFlag>0</FuncFlag></xml>]
+DBG : T: 12/08/15 00:40:23:421: rc/comvm/vmlayer.c: 351 : TRACE: MSGID=08[MSG_ID_ETHERNET_CLOUD_DATA_RX],DID=17[CLOUD],SID=0C[ETHERNET],LEN=88
+DBG : T: 12/08/15 00:40:23:421: 2frame/cloudcont.c: 474 : CLOUD: Online state, FAKE mode send instance/period EMC to cloud success!
+DBG : T: 12/08/15 00:40:23:422: 2frame/cloudcont.c: 995 : CLOUD: Send data len=310, String= [<xml><ToUserName><![CDATA[SAE_MFUNHCU]]></ToUserName><FromUserName><![CDATA[HCU_SH_0301]]></FromUserName><CreateTime>201511080040</CreateTime><MsgType><![CDATA[DEV_REPORT]]></MsgType><Content><![CDATA[25000101000000000000000000000065000001BC0000022B0000029A5665B5F8]]></Content><FuncFlag>0</FuncFlag></xml>]
+DBG : T: 12/08/15 00:40:25:702: rc/comvm/vmlayer.c: 338 : HCU-VM: msgsnd() write msg failed, errno=11
